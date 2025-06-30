@@ -21,9 +21,16 @@
                 {{ currentUser.firstName }} {{ currentUser.lastName }}
               </a>
               <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#" (click)="navigateDashboard()">Dashboard</a></li>
+                <li><a class="dropdown-item" href="#" (click)="navigateDashboard()">
+                  <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                </a></li>
+                <li><a class="dropdown-item" href="#" (click)="navigateVirtualMachines()">
+                  <i class="fas fa-server me-2"></i>Máquinas Virtuales
+                </a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item" href="#" (click)="logout()">Cerrar Sesión</a></li>
+                <li><a class="dropdown-item" href="#" (click)="logout()">
+                  <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                </a></li>
               </ul>
             </li>
           </ul>

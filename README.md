@@ -9,6 +9,8 @@ ArgCloud es una plataforma completa para la gestión de máquinas virtuales en l
 - **Base de datos PostgreSQL**: Almacenamiento confiable
 - **Autenticación JWT**: Sistema de autenticación seguro
 - **Verificación por email**: Registro seguro con confirmación
+- **Gestión completa de VMs**: Crear, administrar y monitorear máquinas virtuales
+- **Integración con Proxmox**: Conectividad directa con servidores Proxmox VE
 - **Docker**: Despliegue con contenedores
 - **Arquitectura Business-Repository-Presenter**: Código limpio y mantenible
 
@@ -20,6 +22,7 @@ ArgCloud es una plataforma completa para la gestión de máquinas virtuales en l
 - Bootstrap 5
 - FontAwesome
 - RxJS
+- NGX-Toastr (notificaciones)
 
 ### Backend
 - Java 17
@@ -31,10 +34,17 @@ ArgCloud es una plataforma completa para la gestión de máquinas virtuales en l
 - BCrypt para hash de contraseñas
 - JavaMail para envío de emails
 
+### Infraestructura
+- Proxmox VE (virtualización)
+- MikroTik (networking)
+- Docker & Docker Compose
+
 ## 📋 Prerrequisitos
 
 - Docker y Docker Compose instalados
 - Git
+- Servidor Proxmox VE (opcional para funcionalidad completa)
+- Router MikroTik (opcional para gestión de red)
 
 ## 🚀 Instalación y Ejecución
 
@@ -58,7 +68,26 @@ Edita el archivo `docker-compose.yml` y configura las variables de email:
 
 **Nota**: Para Gmail, necesitas generar una "Contraseña de aplicación" en la configuración de seguridad de tu cuenta.
 
-### 3. Ejecutar con Docker Compose
+### 3. Configurar APIs externas (Opcional)
+
+Edita `backend/src/main/resources/application.properties` para configurar la integración con Proxmox y MikroTik:
+
+```properties
+# Proxmox VE Configuration
+external.api.proxmox.url=https://tu-servidor-proxmox:8006
+external.api.proxmox.username=root@pam
+external.api.proxmox.password=tu-password
+
+# MikroTik Configuration
+external.api.mikrotik.url=https://tu-router-mikrotik
+external.api.mikrotik.username=admin
+external.api.mikrotik.password=tu-password
+
+# API Client Configuration
+external.api.timeout=30000
+```
+
+### 4. Ejecutar con Docker Compose
 
 ```bash
 docker-compose up --build
@@ -69,11 +98,100 @@ Este comando:
 - Inicia PostgreSQL, backend y frontend
 - Configura la red entre servicios
 
-### 4. Acceder a la aplicación
+### 5. Acceder a la aplicación
 
 - **Frontend**: http://localhost:4200
 - **Backend API**: http://localhost:8080
 - **Base de datos**: localhost:5432
+
+## 🖥️ Gestión de Máquinas Virtuales
+
+### Características Principales
+
+ArgCloud ofrece una gestión completa de máquinas virtuales con las siguientes funcionalidades:
+
+#### 🔧 **Operaciones de VM**
+- **Crear VM**: Interfaz intuitiva para crear nuevas máquinas virtuales
+- **Iniciar/Parar**: Control completo del estado de las VMs
+- **Reiniciar**: Reinicio seguro de máquinas virtuales
+- **Eliminar**: Eliminación segura con confirmación
+- **Sincronizar**: Sincronización con el servidor Proxmox
+
+#### 📊 **Monitoreo y Estadísticas**
+- **Estado en tiempo real**: Visualización del estado actual de cada VM
+- **Recursos**: Monitoreo de CPU, RAM y almacenamiento
+- **Red**: Información de IP y MAC address
+- **Historial**: Fechas de creación y última actualización
+
+#### 🎨 **Interfaz de Usuario**
+- **Dashboard integrado**: Vista general de todas las VMs
+- **Tarjetas informativas**: Cada VM se muestra en una tarjeta con información clave
+- **Filtros y búsqueda**: Encuentra rápidamente las VMs que necesitas
+- **Responsive**: Funciona perfectamente en desktop y móvil
+
+### Modelo de Datos
+
+```typescript
+interface VirtualMachine {
+  id: number;
+  name: string;
+  status: 'running' | 'stopped' | 'restarting' | 'creating' | 'deleting' | 'error';
+  os: string;
+  cpu: number;           // Número de cores
+  memory: number;        // RAM en MB
+  disk: number;          // Almacenamiento en GB
+  ipAddress?: string;    // Dirección IP asignada
+  macAddress?: string;   // Dirección MAC
+  nodeName?: string;     // Nodo Proxmox donde se ejecuta
+  createdAt: string;     // Fecha de creación
+  updatedAt?: string;    // Última actualización
+  userName?: string;     // Usuario propietario
+}
+```
+
+### Funcionalidades por Pantalla
+
+#### 🏠 **Dashboard**
+- Vista general con estadísticas
+- Tarjetas de resumen (VMs activas, CPU total, RAM total, almacenamiento)
+- Lista rápida de VMs con acciones básicas
+- Consola simulada para VMs seleccionadas
+
+#### 🖥️ **Gestión de VMs**
+- **Crear Nueva VM**:
+  - Formulario con validación
+  - Selección de SO, recursos y nodo
+  - Configuración de red automática
+- **Lista de VMs**:
+  - Vista en tarjetas con información completa
+  - Botones de acción contextuales
+  - Estados visuales con colores
+- **Acciones Disponibles**:
+  - ▶️ Iniciar VM
+  - ⏹️ Parar VM
+  - 🔄 Reiniciar VM
+  - 🗑️ Eliminar VM
+  - 🔄 Sincronizar con Proxmox
+
+### Estados de VM
+
+| Estado | Descripción | Color | Acciones Disponibles |
+|--------|-------------|-------|---------------------|
+| `running` | VM en ejecución | 🟢 Verde | Parar, Reiniciar, Eliminar |
+| `stopped` | VM detenida | 🔴 Rojo | Iniciar, Eliminar |
+| `restarting` | VM reiniciándose | 🟡 Amarillo | Ninguna (temporal) |
+| `creating` | VM en creación | 🔵 Azul | Ninguna (temporal) |
+| `deleting` | VM eliminándose | 🟠 Naranja | Ninguna (temporal) |
+| `error` | Error en la VM | ⚫ Gris | Reiniciar, Eliminar |
+
+### Integración con Proxmox
+
+ArgCloud se integra directamente con servidores Proxmox VE para:
+
+- **Sincronización automática**: Las VMs se sincronizan automáticamente
+- **Gestión remota**: Control completo desde la interfaz web
+- **Monitoreo en tiempo real**: Estados actualizados automáticamente
+- **Gestión de recursos**: Asignación dinámica de CPU, RAM y almacenamiento
 
 ## 📁 Estructura del Proyecto
 
@@ -95,9 +213,15 @@ LandingPage/
 ├── frontend/                   # Aplicación Angular
 │   ├── src/app/
 │   │   ├── components/       # Componentes Angular
+│   │   │   ├── virtual-machines/  # Gestión de VMs
+│   │   │   ├── dashboard/         # Dashboard principal
+│   │   │   └── ...
 │   │   ├── services/         # Servicios
+│   │   │   └── virtual-machine.service.ts  # Servicio de VMs
+│   │   ├── models/           # Modelos TypeScript
+│   │   │   └── virtual-machine.model.ts    # Modelo de VM
 │   │   ├── guards/           # Guards de rutas
-│   │   └── models/           # Modelos TypeScript
+│   │   └── interceptors/     # Interceptores HTTP
 │   ├── package.json
 │   ├── angular.json
 │   ├── Dockerfile
@@ -129,7 +253,56 @@ LandingPage/
 
 ### Dashboard (`/api/dashboard`) - Requiere autenticación
 - `GET /welcome` - Mensaje de bienvenida
-- `GET /vms` - Lista de máquinas virtuales (próximamente)
+
+### Máquinas Virtuales (`/api/vms`) - Requiere autenticación
+- `GET /` - Listar todas las VMs del usuario
+- `POST /` - Crear nueva VM
+- `GET /{id}` - Obtener detalles de una VM específica
+- `PUT /{id}/start` - Iniciar VM
+- `PUT /{id}/stop` - Parar VM
+- `PUT /{id}/restart` - Reiniciar VM
+- `DELETE /{id}` - Eliminar VM
+- `POST /{id}/sync` - Sincronizar con Proxmox
+- `GET /nodes` - Obtener nodos Proxmox disponibles
+
+### Ejemplo de Request - Crear VM
+
+```json
+POST /api/vms
+{
+  "name": "Servidor Web Ubuntu",
+  "os": "Ubuntu 22.04",
+  "cpu": 2,
+  "memory": 2048,
+  "disk": 50,
+  "nodeName": "proxmox-node-1"
+}
+```
+
+### Ejemplo de Response - Lista de VMs
+
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "name": "Servidor Web Ubuntu",
+      "status": "running",
+      "os": "Ubuntu 22.04",
+      "cpu": 2,
+      "memory": 2048,
+      "disk": 50,
+      "ipAddress": "192.168.1.100",
+      "macAddress": "00:16:3e:12:34:56",
+      "nodeName": "proxmox-node-1",
+      "createdAt": "2024-01-15T10:30:00Z",
+      "updatedAt": "2024-01-20T14:45:00Z",
+      "userName": "admin"
+    }
+  ]
+}
+```
 
 ## 🎨 Funcionalidades del Frontend
 
@@ -137,7 +310,8 @@ LandingPage/
 - **Home**: Landing page con información del servicio
 - **Login**: Formulario de inicio de sesión
 - **Register**: Formulario de registro
-- **Dashboard**: Panel de administración (funcionalidad básica)
+- **Dashboard**: Panel de administración con vista general de VMs
+- **Virtual Machines**: Gestión completa de máquinas virtuales
 
 ### Características
 - Diseño responsivo con Bootstrap
@@ -145,6 +319,9 @@ LandingPage/
 - Manejo de estados de carga
 - Navegación con guards de autenticación
 - Verificación de email integrada
+- Notificaciones toast con NGX-Toastr
+- Iconos FontAwesome
+- Animaciones y transiciones suaves
 
 ## ⚙️ Configuración de Desarrollo
 
@@ -180,13 +357,19 @@ Para habilitar el envío de emails de verificación:
 
 ## 🚀 Próximas Funcionalidades
 
-- [ ] Gestión completa de máquinas virtuales
-- [ ] Monitoreo en tiempo real
-- [ ] Configuración de recursos (CPU, RAM, Almacenamiento)
-- [ ] Sistema de facturación
+- [x] Gestión completa de máquinas virtuales
+- [x] Interfaz grafica para VMs
+- [x] Integración con Proxmox preparada
+- [ ] Monitoreo en tiempo real con WebSockets
+- [ ] Configuración avanzada de recursos
+- [ ] Sistema de plantillas de VM
+- [ ] Backup y restauración automática
 - [ ] Dashboard con métricas avanzadas
 - [ ] API para gestión programática
-- [ ] Backup y restauración automática
+- [ ] Sistema de facturación
+- [ ] Snapshots de VMs
+- [ ] Migración entre nodos
+- [ ] Consola VNC integrada
 
 ## 📝 Licencia
 

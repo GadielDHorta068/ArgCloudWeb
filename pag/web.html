@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telaraña 3D como Fondo</title>
+    <!-- Importamos una fuente moderna desde Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="main-header">
+        <a href="#home" class="logo">ARGCLOUD</a>
+        <nav>
+            <a href="#home">Inicio</a>
+            <a href="#about">Sobre Nosotros</a>
+            <a href="#services">Servicios</a>
+            <a href="#projects">Proyectos</a>
+            <a href="#contact">Contacto</a>
+        </nav>
+        <a href="login.html" class="cta-button">Acceso Clientes</a>
+    </header>
+
+    <!-- El contenido de la página irá aquí, por encima del canvas -->
+    <section id="home" class="content-overlay">
+        <h1>ARGCLOUD</h1>
+        <p>Estamos para liderar tu proximo proyecto</p>
+    </section>
+
+    <main class="content-wrapper">
+        <section id="about" class="content-section">
+            <h2>Sobre Nosotros</h2>
+            <p>Somos un equipo de desarrolladores y expertos en la nube apasionados por la tecnología. Nuestro objetivo es proporcionar soluciones innovadoras y eficientes para llevar tus ideas al siguiente nivel. Con años de experiencia en la industria, garantizamos calidad y compromiso en cada proyecto.</p>
+        </section>
+
+        <section id="services" class="content-section">
+            <h2>Nuestros Servicios</h2>
+            <div class="services-container">
+                <div class="service-item">
+                    <h3>Gestión de VM</h3>
+                    <p>Optimización, despliegue y mantenimiento de máquinas virtuales en las principales plataformas cloud.</p>
+                </div>
+                <div class="service-item">
+                    <h3>Desarrollos Personalizados</h3>
+                    <p>Creación de aplicaciones web y software a medida, adaptados a las necesidades específicas de tu negocio.</p>
+                </div>
+                <div class="service-item">
+                    <h3>Web Hosting</h3>
+                    <p>Alojamiento web seguro, rápido y fiable con soporte técnico 24/7 para que tu sitio esté siempre online.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="projects" class="content-section">
+            <h2>Proyectos Destacados</h2>
+            <div class="projects-container">
+                <div class="project-item">
+                    <img src="https://via.placeholder.com/400x250/1B2735/FFFFFF?text=Proyecto+1" alt="Imagen del Proyecto 1">
+                    <h3>Cliente A - Plataforma E-commerce</h3>
+                    <p>Desarrollo de una plataforma de comercio electrónico escalable con integraciones de pago y logística.</p>
+                </div>
+                <div class="project-item">
+                    <img src="https://via.placeholder.com/400x250/1B2735/FFFFFF?text=Proyecto+2" alt="Imagen del Proyecto 2">
+                    <h3>Cliente B - Sistema de Gestión Interna</h3>
+                    <p>Creación de un dashboard para la visualización y gestión de datos operativos en tiempo real.</p>
+                </div>
+                <div class="project-item">
+                    <img src="https://via.placeholder.com/400x250/1B2735/FFFFFF?text=Proyecto+3" alt="Imagen del Proyecto 3">
+                    <h3>Cliente C - Web Corporativa y Blog</h3>
+                    <p>Diseño y desarrollo de un sitio web moderno y responsivo para mejorar su presencia en línea.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="content-section">
+            <h2>Contacto</h2>
+            <p>¿Listo para empezar tu próximo proyecto? ¡Contáctanos!</p>
+            <form class="contact-form">
+                <input type="text" name="name" placeholder="Tu Nombre" required>
+                <input type="email" name="email" placeholder="Tu Correo Electrónico" required>
+                <textarea name="message" rows="5" placeholder="Tu Mensaje" required></textarea>
+                <button type="submit">Enviar Mensaje</button>
+            </form>
+        </section>
+    </main>
+    
+    <footer class="main-footer-bottom">
+        <p>&copy; 2024 ARGCLOUD. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Elemento para el punto del cursor personalizado -->
+    <div class="cursor-dot"></div>
+
+    <!-- Importamos la librería three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

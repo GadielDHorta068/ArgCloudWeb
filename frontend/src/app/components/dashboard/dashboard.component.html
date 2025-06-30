@@ -1,180 +1,270 @@
 <div class="container mt-4">
-      <!-- Welcome Section -->
-      <div class="row">
-        <div class="col-12">
-          <div class="card mb-4">
-            <div class="card-body">
-              <h1 class="card-title">
-                <i class="fas fa-tachometer-alt me-2"></i>
-                Panel de Control
-              </h1>
-              <p class="card-text" *ngIf="currentUser">
-                Bienvenido/a, <strong>{{ currentUser.firstName }} {{ currentUser.lastName }}</strong>
-              </p>
-              <small class="text-muted">
-                Administra tus máquinas virtuales desde aquí
-              </small>
+  <!-- Welcome Section -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-body">
+          <h1 class="card-title">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Panel de Control
+          </h1>
+          <p class="card-text" *ngIf="currentUser">
+            Bienvenido/a, <strong>{{ currentUser.firstName }} {{ currentUser.lastName }}</strong>
+          </p>
+          <small class="text-muted">
+            Administra tus máquinas virtuales desde aquí
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4>0</h4>
+              <p class="mb-0">VMs Activas</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-server fa-2x"></i>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Stats Cards -->
-      <div class="row mb-4">
-        <div class="col-lg-3 col-md-6 mb-3">
-          <div class="card bg-primary text-white">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <h4>0</h4>
-                  <p class="mb-0">VMs Activas</p>
-                </div>
-                <div class="align-self-center">
-                  <i class="fas fa-server fa-2x"></i>
-                </div>
-              </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4>0</h4>
+              <p class="mb-0">CPU Cores</p>
             </div>
-          </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6 mb-3">
-          <div class="card bg-success text-white">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <h4>0</h4>
-                  <p class="mb-0">CPU Cores</p>
-                </div>
-                <div class="align-self-center">
-                  <i class="fas fa-microchip fa-2x"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6 mb-3">
-          <div class="card bg-info text-white">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <h4>0 GB</h4>
-                  <p class="mb-0">Memoria RAM</p>
-                </div>
-                <div class="align-self-center">
-                  <i class="fas fa-memory fa-2x"></i>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-3 col-md-6 mb-3">
-          <div class="card bg-warning text-white">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <div>
-                  <h4>0 GB</h4>
-                  <p class="mb-0">Almacenamiento</p>
-                </div>
-                <div class="align-self-center">
-                  <i class="fas fa-hdd fa-2x"></i>
-                </div>
-              </div>
+            <div class="align-self-center">
+              <i class="fas fa-microchip fa-2x"></i>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- VM Management Section -->
-      <div class="row">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-              <h5 class="mb-0">
-                <i class="fas fa-list me-2"></i>
-                Máquinas Virtuales
-              </h5>
-              <button class="btn btn-primary" disabled>
-                <i class="fas fa-plus me-2"></i>
-                Crear VM
-              </button>
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-info text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4>0 GB</h4>
+              <p class="mb-0">Memoria RAM</p>
             </div>
-            <div class="card-body">
-              <div class="alert alert-info" role="alert">
-                <h4 class="alert-heading">
+            <div class="align-self-center">
+              <i class="fas fa-memory fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-3">
+      <div class="card bg-warning text-white">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <h4>0 GB</h4>
+              <p class="mb-0">Almacenamiento</p>
+            </div>
+            <div class="align-self-center">
+              <i class="fas fa-hdd fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- VM Management Section -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0" *ngIf="!selectedMachine">
+            <i class="fas fa-list me-2"></i>
+            Mis Máquinas Virtuales
+          </h5>
+          <h5 class="mb-0" *ngIf="selectedMachine">
+            <a href="#" (click)="deselectMachine(); $event.preventDefault()">
+              <i class="fas fa-arrow-left me-2"></i>
+            </a>
+            {{ selectedMachine.name }}
+          </h5>
+          <button class="btn btn-primary" (click)="createNewVM()" *ngIf="!selectedMachine">
+            <i class="fas fa-plus me-2"></i>
+            Crear VM
+          </button>
+        </div>
+        <div class="card-body">
+          <!-- Vista de Lista de VMs -->
+          <div *ngIf="!selectedMachine">
+            <div class="list-group">
+              <a *ngFor="let vm of virtualMachines" href="#" (click)="selectMachine(vm); $event.preventDefault()"
+                class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <div>
+                  <h6 class="mb-1">{{ vm.name }}</h6>
+                  <small>
+                    <span class="badge" [ngClass]="{
+                      'bg-success': vm.status === 'running',
+                      'bg-danger': vm.status === 'stopped',
+                      'bg-warning': vm.status === 'restarting'
+                    }">
+                      {{ vm.status | titlecase }}
+                    </span>
+                    <span class="ms-2 badge bg-secondary">{{ vm.os }}</span>
+                  </small>
+                </div>
+                <div>
+                  <button class="btn btn-sm btn-outline-success me-1" (click)="startVM(vm); $event.stopPropagation()"
+                    [disabled]="vm.status === 'running'">
+                    <i class="fas fa-play"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-warning me-1" (click)="restartVM(vm); $event.stopPropagation()"
+                    [disabled]="vm.status !== 'running'">
+                    <i class="fas fa-sync-alt"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="stopVM(vm); $event.stopPropagation()"
+                    [disabled]="vm.status === 'stopped'">
+                    <i class="fas fa-stop"></i>
+                  </button>
+                </div>
+              </a>
+              <div *ngIf="virtualMachines.length === 0" class="list-group-item text-center">
+                No tienes máquinas virtuales. ¡Crea una para empezar!
+              </div>
+            </div>
+          </div>
+
+          <!-- Vista de Detalle de VM -->
+          <div *ngIf="selectedMachine">
+            <div class="row">
+              <!-- Columna de la Consola -->
+              <div class="col-md-8">
+                <h5>
+                  <i class="fas fa-terminal me-2"></i>
+                  Consola en Tiempo Real
+                </h5>
+                <div class="bg-dark text-white p-3 rounded" style="height: 400px; font-family: monospace;">
+                  <div>[root&#64;<span>{{ selectedMachine.name }}</span> ~]# _</div>
+                  <div class="text-muted mt-3">(Esta es una simulación de la consola. La funcionalidad real se
+                    implementará próximamente.)</div>
+                </div>
+              </div>
+
+              <!-- Columna de Acciones y Detalles -->
+              <div class="col-md-4">
+                <h5>
+                  <i class="fas fa-cogs me-2"></i>
+                  Acciones
+                </h5>
+                <div class="d-grid gap-2 mb-4">
+                  <button class="btn btn-success" (click)="startVM(selectedMachine)"
+                    [disabled]="selectedMachine.status === 'running'">
+                    <i class="fas fa-play me-2"></i> Iniciar
+                  </button>
+                  <button class="btn btn-warning" (click)="restartVM(selectedMachine)"
+                    [disabled]="selectedMachine.status !== 'running'">
+                    <i class="fas fa-sync-alt me-2"></i> Reiniciar
+                  </button>
+                  <button class="btn btn-danger" (click)="stopVM(selectedMachine)"
+                    [disabled]="selectedMachine.status === 'stopped'">
+                    <i class="fas fa-stop me-2"></i> Parar
+                  </button>
+                  <button class="btn btn-info" (click)="openFTP(selectedMachine)">
+                    <i class="fas fa-folder-open me-2"></i> FTP
+                  </button>
+                </div>
+
+                <h5>
                   <i class="fas fa-info-circle me-2"></i>
-                  Funcionalidad en Desarrollo
-                </h4>
-                <p>
-                  La gestión de máquinas virtuales estará disponible en la próxima versión. 
-                  Por ahora, puedes explorar el panel de control y las estadísticas.
-                </p>
-                <hr>
-                <p class="mb-0">
-                  <strong>Próximas funcionalidades:</strong>
-                </p>
-                <ul class="mt-2 mb-0">
-                  <li>Crear y eliminar máquinas virtuales</li>
-                  <li>Monitoreo en tiempo real</li>
-                  <li>Configuración de recursos</li>
-                  <li>Backup y restauración</li>
+                  Detalles
+                </h5>
+                <ul class="list-group">
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Sistema Operativo
+                    <span class="badge bg-primary rounded-pill">{{ selectedMachine.os }}</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    CPU
+                    <span class="badge bg-primary rounded-pill">{{ selectedMachine.cpu }} Cores</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Memoria
+                    <span class="badge bg-primary rounded-pill">{{ selectedMachine.memory / 1024 }} GB</span>
+                  </li>
+                  <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Disco
+                    <span class="badge bg-primary rounded-pill">{{ selectedMachine.disk }} GB</span>
+                  </li>
                 </ul>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- Account Information -->
-      <div class="row mt-4">
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h5 class="mb-0">
-                <i class="fas fa-user me-2"></i>
-                Información de la Cuenta
-              </h5>
-            </div>
-            <div class="card-body" *ngIf="currentUser">
-              <div class="row">
-                <div class="col-sm-4"><strong>Nombre:</strong></div>
-                <div class="col-sm-8">{{ currentUser.firstName }} {{ currentUser.lastName }}</div>
-              </div>
-              <hr>
-              <div class="row">
-                <div class="col-sm-4"><strong>Email:</strong></div>
-                <div class="col-sm-8">{{ currentUser.email }}</div>
-              </div>
-              <hr>
-              <div class="row">
-                <div class="col-sm-4"><strong>Estado:</strong></div>
-                <div class="col-sm-8">
-                  <span class="badge" [class]="currentUser.emailVerified ? 'bg-success' : 'bg-warning'">
-                    {{ currentUser.emailVerified ? 'Verificado' : 'Pendiente de verificación' }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+  <!-- Account Information -->
+  <div class="row mt-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-user me-2"></i>
+            Información de la Cuenta
+          </h5>
         </div>
-
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-header">
-              <h5 class="mb-0">
-                <i class="fas fa-chart-bar me-2"></i>
-                Actividad Reciente
-              </h5>
-            </div>
-            <div class="card-body">
-              <div class="text-center text-muted">
-                <i class="fas fa-chart-line fa-3x mb-3"></i>
-                <p>No hay actividad reciente</p>
-                <small>Los logs de actividad aparecerán aquí cuando uses tus VMs</small>
-              </div>
+        <div class="card-body" *ngIf="currentUser">
+          <div class="row">
+            <div class="col-sm-4"><strong>Nombre:</strong></div>
+            <div class="col-sm-8">{{ currentUser.firstName }} {{ currentUser.lastName }}</div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-4"><strong>Email:</strong></div>
+            <div class="col-sm-8">{{ currentUser.email }}</div>
+          </div>
+          <hr>
+          <div class="row">
+            <div class="col-sm-4"><strong>Estado:</strong></div>
+            <div class="col-sm-8">
+              <span class="badge" [class]="currentUser.emailVerified ? 'bg-success' : 'bg-warning'">
+                {{ currentUser.emailVerified ? 'Verificado' : 'Pendiente de verificación' }}
+              </span>
             </div>
           </div>
         </div>
       </div>
-    </div> 
+    </div>
+
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-chart-bar me-2"></i>
+            Actividad Reciente
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="text-center text-muted">
+            <i class="fas fa-chart-line fa-3x mb-3"></i>
+            <p>No hay actividad reciente</p>
+            <small>Los logs de actividad aparecerán aquí cuando uses tus VMs</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

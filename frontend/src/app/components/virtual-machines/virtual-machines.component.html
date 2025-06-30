@@ -1,0 +1,328 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="mb-0">
+            <i class="fas fa-server me-2 text-primary"></i>
+            Mis Máquinas Virtuales
+          </h2>
+          <p class="text-muted mb-0">Gestiona tus máquinas virtuales en Proxmox</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button 
+            class="btn btn-outline-secondary"
+            (click)="refreshVms()"
+            [disabled]="loading">
+            <i class="fas fa-sync-alt" [class.fa-spin]="loading"></i>
+            Actualizar
+          </button>
+          <button 
+            class="btn btn-primary"
+            (click)="toggleCreateForm()"
+            [disabled]="loading">
+            <i class="fas fa-plus me-1"></i>
+            Nueva VM
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulario de creación -->
+  <div class="row mb-4" *ngIf="showCreateForm">
+    <div class="col-12">
+      <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-plus me-2"></i>
+            Crear Nueva Máquina Virtual
+          </h5>
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="createVirtualMachine()" #vmForm="ngForm">
+            <div class="row">
+              <!-- Nombre -->
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Nombre de la VM *</label>
+                <input 
+                  type="text" 
+                  class="form-control"
+                  [(ngModel)]="newVmForm.name"
+                  name="name"
+                  placeholder="Ej: mi-servidor-web"
+                  required
+                  maxlength="50">
+                <div class="form-text">Nombre único para identificar tu máquina virtual</div>
+              </div>
+
+              <!-- Sistema Operativo -->
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Sistema Operativo *</label>
+                <select 
+                  class="form-select"
+                  [(ngModel)]="newVmForm.os"
+                  name="os"
+                  required>
+                  <option *ngFor="let os of osOptions" [value]="os.value">
+                    {{ os.label }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- CPU -->
+              <div class="col-md-3 mb-3">
+                <label class="form-label">CPU (cores) *</label>
+                <select 
+                  class="form-select"
+                  [(ngModel)]="newVmForm.cpu"
+                  name="cpu"
+                  required>
+                  <option *ngFor="let cpu of cpuOptions" [value]="cpu">
+                    {{ cpu }} {{ cpu === 1 ? 'core' : 'cores' }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Memoria -->
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Memoria (MB) *</label>
+                <select 
+                  class="form-select"
+                  [(ngModel)]="newVmForm.memory"
+                  name="memory"
+                  required>
+                  <option *ngFor="let mem of memoryOptions" [value]="mem">
+                    {{ mem >= 1024 ? (mem / 1024) + ' GB' : mem + ' MB' }}
+                  </option>
+                </select>
+              </div>
+
+              <!-- Disco -->
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Disco (GB) *</label>
+                <select 
+                  class="form-select"
+                  [(ngModel)]="newVmForm.disk"
+                  name="disk"
+                  required>
+                  <option *ngFor="let disk of diskOptions" [value]="disk">
+                    {{ disk }} GB
+                  </option>
+                </select>
+              </div>
+
+              <!-- Nodo -->
+              <div class="col-md-3 mb-3">
+                <label class="form-label">Nodo Proxmox *</label>
+                <select 
+                  class="form-select"
+                  [(ngModel)]="newVmForm.nodeName"
+                  name="nodeName"
+                  required>
+                  <option value="">Seleccionar nodo</option>
+                  <option *ngFor="let node of availableNodes" [value]="node">
+                    {{ node }}
+                  </option>
+                </select>
+                <div class="form-text" *ngIf="availableNodes.length === 0">
+                  No hay nodos disponibles
+                </div>
+              </div>
+            </div>
+
+            <!-- Botones -->
+            <div class="d-flex justify-content-end gap-2">
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary"
+                (click)="toggleCreateForm()"
+                [disabled]="loading">
+                Cancelar
+              </button>
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="loading || !vmForm.form.valid">
+                <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                <i *ngIf="!loading" class="fas fa-plus me-1"></i>
+                {{ loading ? 'Creando...' : 'Crear VM' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de máquinas virtuales -->
+  <div class="row">
+    <div class="col-12">
+      <!-- Estado de carga -->
+      <div *ngIf="loading && virtualMachines.length === 0" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p class="mt-3 text-muted">Cargando máquinas virtuales...</p>
+      </div>
+
+      <!-- Sin máquinas virtuales -->
+      <div *ngIf="!loading && virtualMachines.length === 0" class="text-center py-5">
+        <i class="fas fa-server fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No tienes máquinas virtuales</h4>
+        <p class="text-muted">Crea tu primera máquina virtual para comenzar</p>
+        <button 
+          class="btn btn-primary"
+          (click)="toggleCreateForm()">
+          <i class="fas fa-plus me-1"></i>
+          Crear Primera VM
+        </button>
+      </div>
+
+      <!-- Tarjetas de máquinas virtuales -->
+      <div *ngIf="virtualMachines.length > 0" class="row">
+        <div *ngFor="let vm of virtualMachines" class="col-lg-6 col-xl-4 mb-4">
+          <div class="card h-100 shadow-sm">
+            <!-- Header de la tarjeta -->
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-desktop me-2 text-primary"></i>
+                <strong>{{ vm.name }}</strong>
+              </div>
+              <span [class]="getStatusClass(vm.status)">
+                <i [class]="getStatusIcon(vm.status)"></i>
+                {{ getStatusText(vm.status) }}
+              </span>
+            </div>
+
+            <!-- Cuerpo de la tarjeta -->
+            <div class="card-body">
+              <!-- Información básica -->
+              <div class="row mb-3">
+                <div class="col-6">
+                  <small class="text-muted">Sistema Operativo</small>
+                  <div class="fw-bold">{{ vm.os }}</div>
+                </div>
+                <div class="col-6">
+                  <small class="text-muted">Nodo</small>
+                  <div class="fw-bold">{{ vm.nodeName }}</div>
+                </div>
+              </div>
+
+              <!-- Especificaciones -->
+              <div class="row mb-3">
+                <div class="col-4">
+                  <small class="text-muted">CPU</small>
+                  <div class="fw-bold">
+                    <i class="fas fa-microchip me-1"></i>
+                    {{ vm.cpu }}
+                  </div>
+                </div>
+                <div class="col-4">
+                  <small class="text-muted">RAM</small>
+                  <div class="fw-bold">
+                    <i class="fas fa-memory me-1"></i>
+                    {{ vm.memory >= 1024 ? (vm.memory / 1024) + 'GB' : vm.memory + 'MB' }}
+                  </div>
+                </div>
+                <div class="col-4">
+                  <small class="text-muted">Disco</small>
+                  <div class="fw-bold">
+                    <i class="fas fa-hdd me-1"></i>
+                    {{ vm.disk }}GB
+                  </div>
+                </div>
+              </div>
+
+              <!-- Información de red -->
+              <div class="row mb-3" *ngIf="vm.ipAddress || vm.macAddress">
+                <div class="col-6" *ngIf="vm.ipAddress">
+                  <small class="text-muted">IP Address</small>
+                  <div class="fw-bold">
+                    <i class="fas fa-network-wired me-1"></i>
+                    {{ vm.ipAddress }}
+                  </div>
+                </div>
+                <div class="col-6" *ngIf="vm.macAddress">
+                  <small class="text-muted">MAC Address</small>
+                  <div class="fw-bold small">{{ vm.macAddress }}</div>
+                </div>
+              </div>
+
+              <!-- Fechas -->
+              <div class="row">
+                <div class="col-6">
+                  <small class="text-muted">Creada</small>
+                  <div class="small">{{ vm.createdAt | date:'short' }}</div>
+                </div>
+                <div class="col-6" *ngIf="vm.updatedAt !== vm.createdAt">
+                  <small class="text-muted">Actualizada</small>
+                  <div class="small">{{ vm.updatedAt | date:'short' }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Footer con acciones -->
+            <div class="card-footer bg-light">
+              <div class="d-flex justify-content-between align-items-center">
+                <!-- Botones de control -->
+                <div class="btn-group" role="group">
+                  <!-- Iniciar -->
+                  <button 
+                    class="btn btn-sm btn-outline-success"
+                    (click)="startVm(vm)"
+                    [disabled]="!canStart(vm)"
+                    title="Iniciar VM">
+                    <span *ngIf="isActionLoading(vm.id, 'start')" class="spinner-border spinner-border-sm"></span>
+                    <i *ngIf="!isActionLoading(vm.id, 'start')" class="fas fa-play"></i>
+                  </button>
+
+                  <!-- Detener -->
+                  <button 
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="stopVm(vm)"
+                    [disabled]="!canStop(vm)"
+                    title="Detener VM">
+                    <span *ngIf="isActionLoading(vm.id, 'stop')" class="spinner-border spinner-border-sm"></span>
+                    <i *ngIf="!isActionLoading(vm.id, 'stop')" class="fas fa-stop"></i>
+                  </button>
+
+                  <!-- Reiniciar -->
+                  <button 
+                    class="btn btn-sm btn-outline-warning"
+                    (click)="restartVm(vm)"
+                    [disabled]="!canRestart(vm)"
+                    title="Reiniciar VM">
+                    <span *ngIf="isActionLoading(vm.id, 'restart')" class="spinner-border spinner-border-sm"></span>
+                    <i *ngIf="!isActionLoading(vm.id, 'restart')" class="fas fa-redo"></i>
+                  </button>
+
+                  <!-- Sincronizar -->
+                  <button 
+                    class="btn btn-sm btn-outline-info"
+                    (click)="syncVm(vm)"
+                    [disabled]="isActionLoading(vm.id, 'sync')"
+                    title="Sincronizar estado">
+                    <span *ngIf="isActionLoading(vm.id, 'sync')" class="spinner-border spinner-border-sm"></span>
+                    <i *ngIf="!isActionLoading(vm.id, 'sync')" class="fas fa-sync-alt"></i>
+                  </button>
+                </div>
+
+                <!-- Botón de eliminar -->
+                <button 
+                  class="btn btn-sm btn-outline-danger"
+                  (click)="deleteVm(vm)"
+                  [disabled]="!canDelete(vm)"
+                  title="Eliminar VM">
+                  <span *ngIf="isActionLoading(vm.id, 'delete')" class="spinner-border spinner-border-sm"></span>
+                  <i *ngIf="!isActionLoading(vm.id, 'delete')" class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

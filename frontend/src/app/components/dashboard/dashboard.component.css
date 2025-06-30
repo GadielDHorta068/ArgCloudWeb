@@ -17,4 +17,35 @@
 }
 .bg-warning {
   background: linear-gradient(45deg, var(--bs-warning), var(--bs-danger)) !important;
+}
+
+.list-group-item-action {
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.list-group-item-action:hover {
+  background-color: #f8f9fa;
+  color: #000;
+}
+
+.console-output {
+  height: 400px;
+  background-color: #212529;
+  color: #f8f9fa;
+  font-family: 'Courier New', Courier, monospace;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  overflow-y: auto;
+}
+
+.console-output .cursor {
+  display: inline-block;
+  background-color: #f8f9fa;
+  width: 10px;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  from, to { background-color: transparent; }
+  50% { background-color: #f8f9fa; }
 } 

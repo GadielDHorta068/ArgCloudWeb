@@ -71,6 +71,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.router.navigate(['/dashboard']);
   }
 
+  /** Navega a la página de máquinas virtuales. */
+  navigateVirtualMachines(): void {
+    this.router.navigate(['/virtual-machines']);
+  }
+
   /** Cierra la sesión del usuario y lo redirige a la página de inicio. */
   logout(): void {
     this.authService.logout();
