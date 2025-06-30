@@ -254,12 +254,65 @@ export class CheckoutComponent implements OnInit, OnDestroy {
             const cardFormData = this.cardForm.getCardFormData();
             console.log('💳 Datos completos del CardForm:', cardFormData);
             
+            // Validar que tenemos los datos mínimos necesarios
+            if (!cardFormData) {
+              console.error('❌ No se pudieron obtener datos del CardForm');
+              this.toastr.error('Error al obtener datos del formulario. Intente nuevamente.');
+              return;
+            }
+            
+            if (!cardFormData.token) {
+              console.error('❌ Token no disponible en CardForm');
+              this.toastr.error('Error al generar token de la tarjeta. Verifique los datos.');
+              return;
+            }
+            
+            console.log('✅ Datos del CardForm validados correctamente');
+            console.log('🔑 Token presente:', !!cardFormData.token);
+            console.log('💳 Payment Method ID:', cardFormData.paymentMethodId);
+            console.log('🏦 Issuer ID:', cardFormData.issuerId);
+            console.log('💰 Installments:', cardFormData.installments);
+            
             this.processPaymentWithToken(cardFormData);
           },
           onError: (error: any) => {
             console.error('Error general en CardForm:', error);
-            this.toastr.error('Ocurrió un error inesperado. Intente nuevamente.');
-            this.isProcessingPayment = false;
+            console.error('Detalles del error:', JSON.stringify(error, null, 2));
+            
+            // Manejar errores específicos según la documentación de MercadoPago
+            if (error.cause_code) {
+              switch (error.cause_code) {
+                case 'get_payment_methods_failed':
+                  console.warn('⚠️ Error no crítico: No se pudieron obtener métodos de pago. El formulario puede continuar funcionando.');
+                  // No mostrar error al usuario, es no crítico
+                  break;
+                case 'get_identification_types_failed':
+                  console.warn('⚠️ Error no crítico: No se pudieron obtener tipos de identificación.');
+                  break;
+                case 'get_payment_installments_failed':
+                  console.warn('⚠️ Error no crítico: No se pudieron obtener cuotas de pago.');
+                  break;
+                case 'card_token_creation_failed':
+                  console.error('❌ Error crítico: No se pudo crear el token de la tarjeta.');
+                  this.toastr.error('Error al procesar la tarjeta. Verifique los datos e intente nuevamente.');
+                  this.isProcessingPayment = false;
+                  break;
+                case 'fields_setup_failed':
+                  console.error('❌ Error crítico: Falló la configuración de campos seguros.');
+                  this.toastr.error('Error crítico en el formulario. Recargue la página.');
+                  this.isProcessingPayment = false;
+                  break;
+                default:
+                  console.error('❌ Error desconocido:', error.cause_code);
+                  this.toastr.error('Ocurrió un error inesperado. Intente nuevamente.');
+                  this.isProcessingPayment = false;
+              }
+            } else {
+              // Error sin código específico
+              console.error('❌ Error sin código específico:', error);
+              this.toastr.error('Ocurrió un error inesperado. Intente nuevamente.');
+              this.isProcessingPayment = false;
+            }
           }
         }
       };

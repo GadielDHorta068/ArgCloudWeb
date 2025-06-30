@@ -246,6 +246,18 @@ public class MercadoPagoService {
         subscription.setStatus(UserSubscription.SubscriptionStatus.PENDING);
         subscription.setCreatedAt(LocalDateTime.now());
         
+        // ✅ CORRECCIÓN: Establecer fechas obligatorias
+        LocalDateTime now = LocalDateTime.now();
+        subscription.setStartDate(now); // Fecha de inicio inmediata
+        
+        // Calcular fecha de finalización según el tipo de suscripción
+        LocalDateTime endDate = "yearly".equals(subscriptionType) ? 
+            now.plusYears(1) : now.plusMonths(1);
+        subscription.setEndDate(endDate);
+        
+        // Establecer próxima fecha de facturación
+        subscription.setNextBillingDate(endDate);
+        
         return userSubscriptionRepository.save(subscription);
     }
 
