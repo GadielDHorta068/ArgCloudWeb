@@ -1,0 +1,216 @@
+/* ===================================================
+   PRICING COMPONENT STYLES - VERSIÓN SIMPLIFICADA
+   Estilos limpios y coherentes para los planes de hardware.
+   =================================================== */
+
+/* ================== Contenedor Principal ================== */
+.pricing-component {
+  background-color: #f8f9fa; /* Un fondo más suave y estándar */
+}
+
+/* ================== Cabecera de la Página ================== */
+.page-header {
+  padding: 4rem 0;
+  background-color: #ffffff;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.page-header h1 {
+  font-weight: 700;
+  color: #343a40;
+}
+
+.page-header .lead {
+  color: #6c757d;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ================== Selector de Facturación ================== */
+.billing-toggle .btn-group {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.billing-toggle .btn {
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.billing-toggle .btn-check:checked + .btn {
+  background-color: #0d6efd; /* Azul primario de Bootstrap */
+  color: white;
+}
+
+.billing-toggle .badge {
+  font-size: 0.7rem;
+  vertical-align: middle;
+}
+
+/* ================== Tarjetas de Planes (Cards) ================== */
+.plan-card {
+  border-radius: 0.75rem; /* Bordes más sutiles */
+  border: 1px solid #dee2e6;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #ffffff;
+}
+
+.plan-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+}
+
+/* Plan Popular y Plan Actual */
+.plan-card.is-popular {
+  border-color: #0d6efd;
+  box-shadow: 0 0.5rem 2rem rgba(13, 110, 253, 0.2);
+}
+
+.plan-card.is-current {
+  border-color: #198754; /* Verde de Bootstrap */
+  box-shadow: 0 0.5rem 2rem rgba(25, 135, 84, 0.2);
+}
+
+/* Insignia de "Más Popular" */
+.popular-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  background-color: #0d6efd;
+  color: white;
+  border: 2px solid white;
+}
+
+/* ================== Cabecera de la Tarjeta ================== */
+.plan-card .card-header {
+  border-bottom: 1px solid #dee2e6;
+  background-color: #f8f9fa; /* Fondo neutro */
+  padding: 1.5rem;
+}
+
+.plan-card .card-header .plan-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.plan-card .card-header .card-title {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #212529;
+}
+
+.plan-card .card-header .card-text {
+  color: #6c757d;
+}
+
+/* ================== Cuerpo de la Tarjeta ================== */
+.plan-card .card-body {
+  padding: 1.5rem;
+}
+
+/* Precio */
+.price-display {
+  margin-bottom: 1.5rem;
+}
+
+.price-display .price {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #212529;
+}
+
+.price-display .billing-cycle {
+  font-size: 1rem;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+/* Especificaciones de Recursos */
+.resource-specs .spec-item {
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.resource-specs .spec-item:hover {
+  background-color: #e9ecef;
+}
+
+.resource-specs .spec-item i {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.resource-specs .spec-item .fw-bold {
+  font-size: 1.1rem;
+}
+
+.resource-specs .spec-item .text-muted {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+/* Lista de Características */
+.features-list ul {
+  padding-left: 0;
+}
+
+.features-list li {
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  color: #495057;
+}
+
+.features-list li i {
+  color: #198754; /* Icono verde */
+  width: 25px;
+}
+
+/* Nivel de Soporte */
+.support-level {
+  background-color: #f8f9fa;
+  border-radius: 0.5rem;
+  border-left: 4px solid #0d6efd;
+  padding: 0.75rem 1rem;
+}
+
+/* ================== Pie de la Tarjeta ================== */
+.plan-card .card-footer {
+  background-color: #ffffff;
+  border-top: 1px solid #dee2e6;
+  padding: 1.5rem;
+}
+
+.plan-card .btn {
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  width: 100%;
+}
+
+/* ================== Sección de Ayuda ================== */
+.help-section {
+  padding: 4rem 0;
+  background-color: #343a40;
+  color: white;
+}
+
+.help-section h3 {
+  font-weight: 700;
+}
+
+.help-section .lead {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.help-section .btn-success {
+  background-color: #25d366;
+  border-color: #25d366;
+}
+
+/* ================== Estado de Carga y Vacío ================== */
+.loading-state,
+.empty-state {
+  padding: 4rem 0;
+} 

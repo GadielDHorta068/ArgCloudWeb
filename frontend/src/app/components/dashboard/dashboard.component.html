@@ -263,4 +263,68 @@
       </div>
     </div>
   </div>
+
+  <!-- Quick Actions Section -->
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="fas fa-rocket me-2"></i>
+            Acciones Rápidas
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-3">
+              <button type="button" class="btn btn-primary w-100" routerLink="/pricing">
+                <i class="fas fa-tags d-block mb-2" style="font-size: 1.5rem;"></i>
+                <strong>Ver Planes</strong>
+                <small class="d-block">Explorar y actualizar planes</small>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button type="button" class="btn btn-success w-100" routerLink="/virtual-machines">
+                <i class="fas fa-plus-circle d-block mb-2" style="font-size: 1.5rem;"></i>
+                <strong>Crear VM</strong>
+                <small class="d-block">Nueva máquina virtual</small>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button type="button" class="btn btn-info w-100" routerLink="/virtual-machines">
+                <i class="fas fa-list d-block mb-2" style="font-size: 1.5rem;"></i>
+                <strong>Mis VMs</strong>
+                <small class="d-block">Gestionar máquinas</small>
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button type="button" class="btn btn-warning w-100" routerLink="/pricing">
+                <i class="fas fa-chart-pie d-block mb-2" style="font-size: 1.5rem;"></i>
+                <strong>Recursos</strong>
+                <small class="d-block">Ver uso de recursos</small>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Plan Status -->
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="alert alert-info d-flex align-items-center" role="alert">
+                <i class="fas fa-info-circle me-3"></i>
+                <div>
+                  <strong>¿Necesitas más recursos?</strong> 
+                  <span class="ms-2">
+                    <a routerLink="/pricing" class="btn btn-sm btn-outline-primary">
+                      Ver Planes Disponibles
+                    </a>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

@@ -9,6 +9,13 @@
         </button>
         
         <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" (click)="navigatePricing($event)" style="cursor: pointer;">
+                <i class="fas fa-tags me-1"></i>Planes
+              </a>
+            </li>
+          </ul>
           <ul class="navbar-nav ms-auto">
             <li class="nav-item" *ngIf="!isLoggedIn">
               <a class="nav-link" (click)="navigateLogin($event)" style="cursor: pointer;">Iniciar Sesión</a>

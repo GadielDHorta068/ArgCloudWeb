@@ -9,14 +9,15 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.security.core.userdetails.User.UserBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -60,7 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 email = jwtUtils.getEmailFromJwtToken(token);
             } catch (Exception e) {
-                System.err.println("No se pudo obtener el email del token JWT: " + e.getMessage());
+                // Consider logging this exception with a proper logger
             }
         }
 
@@ -70,16 +71,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (userOptional.isPresent()) {
                     User user = userOptional.get();
                     
-                    // Crear UserDetails
-                    UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
-                            .username(user.getEmail())
-                            .password(user.getPassword())
-                            .authorities(new ArrayList<>())
-                            .build();
+                    // Crear una lista de authorities
+                    List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
 
+                    // Crear autenticación con authorities
                     UsernamePasswordAuthenticationToken authToken = 
                         new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
+                            user.getEmail(), // Principal
+                            null, // Credentials
+                            authorities // Authorities
+                        );
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }

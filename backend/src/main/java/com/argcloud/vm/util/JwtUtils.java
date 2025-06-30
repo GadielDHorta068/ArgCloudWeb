@@ -15,10 +15,10 @@ import java.util.Date;
 @Component
 public class JwtUtils {
 
-    @Value("${jwt.secret}")
+    @Value("${argcloud.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${jwt.expiration}")
+    @Value("${argcloud.jwt.expiration}")
     private int jwtExpirationMs;
 
     /**
@@ -68,18 +68,43 @@ public class JwtUtils {
      * @return true si el token es válido, false en caso contrario.
      */
     public boolean validateJwtToken(String authToken) {
+        System.out.println("🔐 JwtUtils - Validando token JWT...");
+        System.out.println("   Token (primeros 30 chars): " + authToken.substring(0, Math.min(authToken.length(), 30)) + "...");
+        System.out.println("   Secret configurado: " + (jwtSecret != null && !jwtSecret.isEmpty() ? "✅ Sí" : "❌ No"));
+        
         try {
             SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes());
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(authToken);
+            System.out.println("   SecretKey creada: ✅");
+            
+            Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(authToken)
+                .getBody();
+                
+            System.out.println("   Claims extraídas: ✅");
+            System.out.println("   Subject (email): " + claims.getSubject());
+            System.out.println("   Issued at: " + claims.getIssuedAt());
+            System.out.println("   Expires at: " + claims.getExpiration());
+            System.out.println("   Token válido: ✅");
+            
             return true;
         } catch (MalformedJwtException e) {
-            System.err.println("Token JWT inválido: " + e.getMessage());
+            System.err.println("❌ Token JWT inválido (malformado): " + e.getMessage());
+            e.printStackTrace();
         } catch (ExpiredJwtException e) {
-            System.err.println("Token JWT expirado: " + e.getMessage());
+            System.err.println("❌ Token JWT expirado: " + e.getMessage());
+            System.err.println("   Fecha de expiración: " + e.getClaims().getExpiration());
+            System.err.println("   Fecha actual: " + new Date());
         } catch (UnsupportedJwtException e) {
-            System.err.println("Token JWT no soportado: " + e.getMessage());
+            System.err.println("❌ Token JWT no soportado: " + e.getMessage());
+            e.printStackTrace();
         } catch (IllegalArgumentException e) {
-            System.err.println("JWT claims string está vacío: " + e.getMessage());
+            System.err.println("❌ JWT claims string está vacío: " + e.getMessage());
+            e.printStackTrace();
+        } catch (Exception e) {
+            System.err.println("❌ Error inesperado validando JWT: " + e.getMessage());
+            e.printStackTrace();
         }
         return false;
     }

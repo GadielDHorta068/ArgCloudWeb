@@ -126,10 +126,12 @@ export class AuthService {
   }
 
   /**
-   * Cierra la sesión del usuario actual.
+   * Elimina el token y los datos del usuario del almacenamiento local y actualiza el estado de autenticación.
    */
-  logout(): void {
-    this.clearAuthData();
+  public logout(): void {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    this.currentUserSubject.next(null);
   }
 
   /**
@@ -196,10 +198,11 @@ export class AuthService {
   }
 
   /**
-   * Comprueba si el servicio de autenticación ha terminado su inicialización.
-   * @returns `true` si la inicialización ha finalizado.
+   * Comprueba si el servicio de autenticación está inicializado.
+   * @returns `true` si el servicio está inicializado, `false` en caso contrario.
    */
   public isAuthInitialized(): boolean {
     return this.isInitialized;
   }
+
 } 

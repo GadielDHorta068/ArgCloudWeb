@@ -56,7 +56,14 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/plans/**").permitAll()  // Permitir ver planes sin autenticación
+                        .requestMatchers("/api/payments/public-key").permitAll()  // Permitir obtener clave pública
+                        .requestMatchers("/api/payments/webhook").permitAll()  // Webhook de Mercado Pago debe ser público
                         .requestMatchers("/api/dashboard/**").authenticated()
+                        .requestMatchers("/api/subscriptions/**").authenticated()  // Endpoints de suscripciones requieren autenticación
+                        .requestMatchers("/api/payments/create").authenticated()  // Crear pago requiere autenticación
+                        .requestMatchers("/api/payments/**").authenticated()  // Otros endpoints de pagos requieren autenticación
+                        .requestMatchers("/api/virtual-machines/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtils, userService), UsernamePasswordAuthenticationFilter.class);

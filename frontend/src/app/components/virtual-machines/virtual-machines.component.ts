@@ -5,6 +5,8 @@ import { takeUntil, switchMap, startWith } from 'rxjs/operators';
 import { VirtualMachine, VirtualMachineRequest } from '../../models/virtual-machine.model';
 import { VirtualMachineService } from '../../services/virtual-machine.service';
 import { ToastrService } from 'ngx-toastr';
+import { HardwarePlanService } from '../../services/hardware-plan.service';
+import { ResourceSummary } from '../../models/hardware-plan.model';
 
 @Component({
   selector: 'app-virtual-machines',
@@ -17,6 +19,11 @@ export class VirtualMachinesComponent implements OnInit, OnDestroy {
   loading = false;
   showCreateForm = false;
   selectedVm: VirtualMachine | null = null;
+  resourceSummary: ResourceSummary | null = null;
+
+  availableCpu: number = 0;
+  availableMemory: number = 0;
+  availableDisk: number = 0;
   
   // Formulario de creación
   newVmForm: VirtualMachineRequest = {
@@ -45,12 +52,9 @@ export class VirtualMachinesComponent implements OnInit, OnDestroy {
     { value: 'windows-server-2022', label: 'Windows Server 2022' }
   ];
 
-  cpuOptions = [1, 2, 4, 8, 16];
-  memoryOptions = [1024, 2048, 4096, 8192, 16384, 32768];
-  diskOptions = [10, 20, 40, 80, 160, 320];
-
   constructor(
     private vmService: VirtualMachineService,
+    private hardwarePlanService: HardwarePlanService,
     private toastr: ToastrService,
     private router: Router
   ) {}
@@ -72,7 +76,8 @@ export class VirtualMachinesComponent implements OnInit, OnDestroy {
     this.loading = true;
     Promise.all([
       this.loadVirtualMachines(),
-      this.loadAvailableNodes()
+      this.loadAvailableNodes(),
+      this.loadResourceSummary()
     ]).finally(() => {
       this.loading = false;
     });
@@ -122,6 +127,34 @@ export class VirtualMachinesComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Error al cargar nodos disponibles:', error);
       this.toastr.warning('No se pudieron cargar los nodos disponibles', 'Advertencia');
+    }
+  }
+
+  /**
+   * Carga el resumen de recursos y calcula los límites disponibles.
+   */
+  private async loadResourceSummary(): Promise<void> {
+    try {
+      this.resourceSummary = await this.hardwarePlanService.getResourceSummary().toPromise() || null;
+      if (this.resourceSummary) {
+        this.availableCpu = this.resourceSummary.total.cpu - this.resourceSummary.used.cpu;
+        this.availableMemory = this.resourceSummary.total.memory - this.resourceSummary.used.memory;
+        this.availableDisk = this.resourceSummary.total.disk - this.resourceSummary.used.disk;
+
+        // Ajustar el valor inicial del formulario si excede los límites
+        if (this.newVmForm.cpu > this.availableCpu) {
+          this.newVmForm.cpu = this.availableCpu > 0 ? 1 : 0;
+        }
+        if (this.newVmForm.memory > this.availableMemory) {
+          this.newVmForm.memory = this.availableMemory > 0 ? 1024 : 0;
+        }
+        if (this.newVmForm.disk > this.availableDisk) {
+          this.newVmForm.disk = this.availableDisk > 0 ? 10 : 0;
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar el resumen de recursos:', error);
+      this.toastr.error('No se pudo cargar el resumen de recursos.', 'Error');
     }
   }
 
@@ -370,5 +403,12 @@ export class VirtualMachinesComponent implements OnInit, OnDestroy {
    */
   refreshVms(): void {
     this.loadVirtualMachines();
+  }
+
+  /**
+   * Formatea la memoria para mostrar en el template.
+   */
+  formatMemory(memoryMB: number): string {
+    return this.hardwarePlanService.formatMemory(memoryMB);
   }
 } 

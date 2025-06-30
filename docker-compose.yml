@@ -5,15 +5,16 @@ services:
     image: postgres:15-alpine
     container_name: argcloud-postgres
     environment:
-      POSTGRES_DB: argcloud_db
-      POSTGRES_USER: argcloud_user
-      POSTGRES_PASSWORD: argcloud_password
+      POSTGRES_DB: ${DB_NAME:-argcloud_db}
+      POSTGRES_USER: ${DB_USERNAME:-argcloud_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-argcloud_password}
     ports:
-      - "5433:5432"
+      - "${DB_EXTERNAL_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - argcloud-network
+    restart: unless-stopped
 
   backend:
     build:
@@ -21,34 +22,99 @@ services:
       dockerfile: Dockerfile
     container_name: argcloud-backend
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - DATABASE_URL=jdbc:postgresql://postgres:5432/argcloud_db
-      - DATABASE_USERNAME=argcloud_user  
-      - DATABASE_PASSWORD=argcloud_password
-      - MAIL_HOST=smtp.gmail.com
-      - MAIL_PORT=587
+      # Base de datos
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-argcloud_db}
+      - DB_USERNAME=${DB_USERNAME:-argcloud_user}
+      - DB_PASSWORD=${DB_PASSWORD:-argcloud_password}
+      
+      # JPA/Hibernate
+      - JPA_DDL_AUTO=${JPA_DDL_AUTO:-update}
+      - JPA_SHOW_SQL=${JPA_SHOW_SQL:-false}
+      
+      # JWT
+      - JWT_SECRET=${JWT_SECRET:-8q2HdS}$$250z}
+      - JWT_EXPIRATION=${JWT_EXPIRATION:-86400}
+      
+      # Email
+      - MAIL_HOST=${MAIL_HOST:-smtp.gmail.com}
+      - MAIL_PORT=${MAIL_PORT:-587}
       - MAIL_USERNAME=${MAIL_USERNAME:-tu-email@gmail.com}
-      - MAIL_PASSWORD=${MAIL_PASSWORD:-tu-contraseña-de-aplicacion}
-      - MAIL_FROM_NAME=ArgCloud Platform
-      - MAIL_FROM_EMAIL=${MAIL_USERNAME:-tu-email@gmail.com}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-tu-app-password}
+      - MAIL_VERIFICATION_SUBJECT=${MAIL_VERIFICATION_SUBJECT:-Verifica tu cuenta en ArgCloud}
+      - MAIL_VERIFICATION_URL=${MAIL_VERIFICATION_URL:-http://localhost:4200/auth/verify-email}
+      
+      # Mercado Pago - IMPORTANTE: Configura estas variables
+      - MERCADOPAGO_ACCESS_TOKEN=${MERCADOPAGO_ACCESS_TOKEN:-TEST-tu-access-token}
+      - MERCADOPAGO_PUBLIC_KEY=${MERCADOPAGO_PUBLIC_KEY:-TEST-tu-public-key}
+      - MERCADOPAGO_WEBHOOK_SECRET=${MERCADOPAGO_WEBHOOK_SECRET:-tu-webhook-secret}
+      - MERCADOPAGO_ENVIRONMENT=${MERCADOPAGO_ENVIRONMENT:-sandbox}
+      - MERCADOPAGO_SUCCESS_URL=${MERCADOPAGO_SUCCESS_URL:-http://localhost:4200/payment/success}
+      - MERCADOPAGO_FAILURE_URL=${MERCADOPAGO_FAILURE_URL:-http://localhost:4200/payment/failure}
+      - MERCADOPAGO_PENDING_URL=${MERCADOPAGO_PENDING_URL:-http://localhost:4200/payment/pending}
+      - MERCADOPAGO_NOTIFICATION_URL=${MERCADOPAGO_NOTIFICATION_URL:-http://localhost:8080/api/payments/webhook}
+      
+      # Proxmox (Opcional)
+      - PROXMOX_URL=${PROXMOX_URL:-https://proxmox.example.com:8006}
+      - PROXMOX_USERNAME=${PROXMOX_USERNAME:-root@pam}
+      - PROXMOX_PASSWORD=${PROXMOX_PASSWORD:-}
+      - PROXMOX_NODE=${PROXMOX_NODE:-pve}
+      - PROXMOX_VERIFY_SSL=${PROXMOX_VERIFY_SSL:-false}
+      
+      # MikroTik (Opcional)
+      - MIKROTIK_URL=${MIKROTIK_URL:-https://mikrotik.example.com}
+      - MIKROTIK_USERNAME=${MIKROTIK_USERNAME:-admin}
+      - MIKROTIK_PASSWORD=${MIKROTIK_PASSWORD:-}
+      
+      # API Configuration
+      - API_TIMEOUT=${API_TIMEOUT:-30000}
+      - API_MAX_RETRIES=${API_MAX_RETRIES:-3}
+      
+      # Application
+      - APP_NAME=${APP_NAME:-ArgCloud}
+      - APP_VERSION=${APP_VERSION:-1.0.0}
+      - APP_ENVIRONMENT=${APP_ENVIRONMENT:-docker}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:4200}
+      - BACKEND_URL=${BACKEND_URL:-http://localhost:8080}
+      
+      # Security
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:4200,http://localhost:3000}
+      - CORS_ALLOWED_METHODS=${CORS_ALLOWED_METHODS:-GET,POST,PUT,DELETE,OPTIONS}
+      - CORS_ALLOWED_HEADERS=${CORS_ALLOWED_HEADERS:-*}
+      
+      # Logging
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_LEVEL_WEB=${LOG_LEVEL_WEB:-WARN}
+      - LOG_LEVEL_SQL=${LOG_LEVEL_SQL:-WARN}
+      
+      # Server
+      - SERVER_PORT=${SERVER_PORT:-8080}
+      
     ports:
-      - "8080:8080"
+      - "${BACKEND_PORT:-8080}:8080"
     depends_on:
       - postgres
     networks:
       - argcloud-network
+    restart: unless-stopped
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     container_name: argcloud-frontend
+    environment:
+      # Variables para el frontend (se pueden usar en build time)
+      - BACKEND_URL=${BACKEND_URL:-http://localhost:8080}
+      - MERCADOPAGO_PUBLIC_KEY=${MERCADOPAGO_PUBLIC_KEY:-TEST-tu-public-key}
     ports:
-      - "4200:80"
+      - "${FRONTEND_PORT:-4200}:80"
     depends_on:
       - backend
     networks:
       - argcloud-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:
@@ -56,3 +122,37 @@ volumes:
 networks:
   argcloud-network:
     driver: bridge
+
+# =====================================
+# INSTRUCCIONES DE CONFIGURACIÓN
+# =====================================
+# 1. Crea un archivo .env en la raíz del proyecto
+# 2. Copia las siguientes variables y configúralas:
+#
+# # Base de datos
+# DB_NAME=argcloud_db
+# DB_USERNAME=argcloud_user
+# DB_PASSWORD=tu_password_seguro
+#
+# # JWT
+# JWT_SECRET=8q2HdS}$250z
+#
+# # Email (para Gmail, necesitas una "App Password")
+# MAIL_USERNAME=tu-email@gmail.com
+# MAIL_PASSWORD=tu-app-password
+#
+# # MERCADO PAGO (OBLIGATORIO para pagos)
+# # Obtén estas credenciales en: https://www.mercadopago.com.ar/developers/panel
+# MERCADOPAGO_ACCESS_TOKEN=TEST-tu-access-token
+# MERCADOPAGO_PUBLIC_KEY=TEST-tu-public-key
+# MERCADOPAGO_WEBHOOK_SECRET=tu-webhook-secret
+# MERCADOPAGO_ENVIRONMENT=sandbox
+#
+# # URLs de tu aplicación
+# FRONTEND_URL=http://localhost:4200
+# BACKEND_URL=http://localhost:8080
+#
+# 3. Para producción, cambia:
+#    - MERCADOPAGO_ENVIRONMENT=production
+#    - JWT_SECRET=8q2HdS}$250z (ya configurado)
+#    - URLs por tus dominios reales

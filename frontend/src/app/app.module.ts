@@ -4,6 +4,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 import { ToastrModule } from 'ngx-toastr';
 
@@ -15,6 +16,9 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { HeaderComponent } from './components/header/header.component';
 import { VirtualMachinesComponent } from './components/virtual-machines/virtual-machines.component';
 import { TermsModalComponent } from './components/terms-modal/terms-modal.component';
+import { PricingComponent } from './components/pricing/pricing.component';
+import { ResourceSummaryComponent } from './components/resource-summary/resource-summary.component';
+import { CheckoutComponent } from './components/checkout/checkout.component';
 
 import { AuthService } from './services/auth.service';
 import { TermsConditionsService } from './services/terms-conditions.service';
@@ -28,6 +32,8 @@ const routes = [
   { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'virtual-machines', component: VirtualMachinesComponent, canActivate: [AuthGuard] },
+  { path: 'pricing', component: PricingComponent },
+  { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
   { path: 'verify-email', component: HomeComponent },
   { path: '**', redirectTo: '' }
 ];
@@ -41,10 +47,14 @@ const routes = [
     DashboardComponent,
     HeaderComponent,
     VirtualMachinesComponent,
-    TermsModalComponent
+    TermsModalComponent,
+    PricingComponent,
+    ResourceSummaryComponent,
+    CheckoutComponent
   ],
   imports: [
     BrowserModule,
+    CommonModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
     FormsModule,

@@ -21,7 +21,8 @@
           <button 
             class="btn btn-primary"
             (click)="toggleCreateForm()"
-            [disabled]="loading">
+            [disabled]="loading || availableCpu <= 0"
+            [title]="availableCpu <= 0 ? 'No tienes recursos suficientes para crear una nueva VM' : 'Crear una nueva máquina virtual'">
             <i class="fas fa-plus me-1"></i>
             Nueva VM
           </button>
@@ -72,45 +73,60 @@
               </div>
 
               <!-- CPU -->
-              <div class="col-md-3 mb-3">
-                <label class="form-label">CPU (cores) *</label>
-                <select 
-                  class="form-select"
+              <div class="col-md-4 mb-3">
+                <label class="form-label d-flex justify-content-between">
+                  <span>CPU (vCores) *</span>
+                  <span class="badge bg-primary">{{ newVmForm.cpu }} {{ newVmForm.cpu === 1 ? 'core' : 'cores' }}</span>
+                </label>
+                <input 
+                  type="range"
+                  class="form-range"
                   [(ngModel)]="newVmForm.cpu"
                   name="cpu"
+                  min="1"
+                  [max]="availableCpu"
+                  step="1"
+                  [disabled]="availableCpu <= 0"
                   required>
-                  <option *ngFor="let cpu of cpuOptions" [value]="cpu">
-                    {{ cpu }} {{ cpu === 1 ? 'core' : 'cores' }}
-                  </option>
-                </select>
+                <div class="form-text">Máximo disponible: {{ availableCpu }} cores</div>
               </div>
 
               <!-- Memoria -->
-              <div class="col-md-3 mb-3">
-                <label class="form-label">Memoria (MB) *</label>
-                <select 
-                  class="form-select"
+              <div class="col-md-4 mb-3">
+                <label class="form-label d-flex justify-content-between">
+                  <span>Memoria (RAM) *</span>
+                  <span class="badge bg-primary">{{ formatMemory(newVmForm.memory) }}</span>
+                </label>
+                <input 
+                  type="range"
+                  class="form-range"
                   [(ngModel)]="newVmForm.memory"
                   name="memory"
+                  min="1024"
+                  [max]="availableMemory"
+                  step="1024"
+                  [disabled]="availableMemory <= 0"
                   required>
-                  <option *ngFor="let mem of memoryOptions" [value]="mem">
-                    {{ mem >= 1024 ? (mem / 1024) + ' GB' : mem + ' MB' }}
-                  </option>
-                </select>
+                <div class="form-text">Máximo disponible: {{ formatMemory(availableMemory) }}</div>
               </div>
 
               <!-- Disco -->
-              <div class="col-md-3 mb-3">
-                <label class="form-label">Disco (GB) *</label>
-                <select 
-                  class="form-select"
+              <div class="col-md-4 mb-3">
+                <label class="form-label d-flex justify-content-between">
+                  <span>Disco (SSD) *</span>
+                  <span class="badge bg-primary">{{ newVmForm.disk }} GB</span>
+                </label>
+                <input 
+                  type="range"
+                  class="form-range"
                   [(ngModel)]="newVmForm.disk"
                   name="disk"
+                  min="10"
+                  [max]="availableDisk"
+                  step="10"
+                  [disabled]="availableDisk <= 0"
                   required>
-                  <option *ngFor="let disk of diskOptions" [value]="disk">
-                    {{ disk }} GB
-                  </option>
-                </select>
+                <div class="form-text">Máximo disponible: {{ availableDisk }} GB</div>
               </div>
 
               <!-- Nodo -->

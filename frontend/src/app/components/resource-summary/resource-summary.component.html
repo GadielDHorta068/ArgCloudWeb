@@ -1,0 +1,426 @@
+<!-- Resource Summary Card -->
+<div class="resource-summary-container">
+
+  <!-- Header -->
+  <div *ngIf="showHeader" class="card-header bg-primary text-white">
+    <div class="d-flex justify-content-between align-items-center">
+      <h5 class="card-title mb-0">
+        <i class="fas fa-chart-pie me-2"></i>
+        Resumen de Recursos
+      </h5>
+      <div class="header-actions">
+        <button type="button" 
+                class="btn btn-outline-light btn-sm me-2" 
+                (click)="refreshData()"
+                [disabled]="isLoading">
+          <i class="fas fa-sync-alt me-1" [class.fa-spin]="isLoading"></i>
+          Actualizar
+        </button>
+        <small class="text-light opacity-75">
+          <i class="fas fa-clock me-1"></i>
+          {{ lastUpdated | date:'HH:mm:ss' }}
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading && !resourceSummary" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+    <p class="mt-2 text-muted">Cargando recursos...</p>
+  </div>
+
+  <!-- No Subscription State -->
+  <div *ngIf="!isLoading && !resourceSummary" class="text-center py-5">
+    <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+    <h4>Sin Plan Activo</h4>
+    <p class="text-muted mb-4">
+      Necesitas una suscripción activa para ver tus recursos.
+    </p>
+    <button type="button" class="btn btn-primary" routerLink="/pricing">
+      <i class="fas fa-shopping-cart me-2"></i>
+      Ver Planes
+    </button>
+  </div>
+
+  <!-- Resource Summary Content -->
+  <div *ngIf="resourceSummary" class="card-body">
+
+    <!-- Current Plan Info -->
+    <div *ngIf="userSubscription" class="current-plan-info alert alert-info d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <i class="fas fa-star me-2"></i>
+        Tu plan actual: <strong>{{ userSubscription.plan?.name }}</strong>
+      </div>
+      <button class="btn btn-sm btn-outline-primary" routerLink="/pricing">
+        Ver detalles del plan
+        <i class="fas fa-arrow-right ms-2"></i>
+      </button>
+    </div>
+
+    <!-- Overall Stats -->
+    <div class="overall-stats mb-4" *ngIf="getStats() as stats">
+      <div class="row g-3">
+        
+        <!-- Total Usage -->
+        <div class="col-md-4">
+          <div class="stat-card text-center">
+            <div class="stat-icon">
+              <i class="fas fa-tachometer-alt"></i>
+            </div>
+            <div class="stat-value">{{ stats.totalUsagePercentage }}%</div>
+            <div class="stat-label">Uso Total Promedio</div>
+          </div>
+        </div>
+
+        <!-- Most Used Resource -->
+        <div class="col-md-4">
+          <div class="stat-card text-center">
+            <div class="stat-icon text-warning">
+              <i class="fas fa-arrow-up"></i>
+            </div>
+            <div class="stat-value">{{ stats.mostUsedResource }}</div>
+            <div class="stat-label">Recurso Más Usado</div>
+          </div>
+        </div>
+
+        <!-- Least Used Resource -->
+        <div class="col-md-4">
+          <div class="stat-card text-center">
+            <div class="stat-icon text-success">
+              <i class="fas fa-arrow-down"></i>
+            </div>
+            <div class="stat-value">{{ stats.leastUsedResource }}</div>
+            <div class="stat-label">Recurso Menos Usado</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Resource Details -->
+    <div class="resource-details">
+      <div class="row g-4">
+
+        <!-- CPU Usage -->
+        <div class="col-lg-6 col-md-12">
+          <div class="resource-item">
+            <div class="resource-header">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-microchip text-primary me-2"></i>
+                <h6 class="mb-0">CPU (vCores)</h6>
+                <span *ngIf="isCritical(resourceSummary.used.cpu, resourceSummary.total.cpu)" 
+                      class="badge bg-danger ms-2">
+                  ¡Crítico!
+                </span>
+                <span *ngIf="isWarning(resourceSummary.used.cpu, resourceSummary.total.cpu)" 
+                      class="badge bg-warning ms-2">
+                  Advertencia
+                </span>
+              </div>
+              <div class="resource-values">
+                <span class="current-usage">
+                  {{ resourceSummary.used.cpu }} / {{ resourceSummary.total.cpu }}
+                </span>
+                <span class="usage-percentage">
+                  {{ getUsagePercentage(resourceSummary.used.cpu, resourceSummary.total.cpu) }}%
+                </span>
+              </div>
+            </div>
+            
+            <div class="progress mb-2" style="height: 8px;">
+              <div class="progress-bar" 
+                   [ngClass]="getProgressBarClass(getUsagePercentage(resourceSummary.used.cpu, resourceSummary.total.cpu))"
+                   [style.width.%]="getUsagePercentage(resourceSummary.used.cpu, resourceSummary.total.cpu)">
+              </div>
+            </div>
+            
+            <small class="text-muted">
+              {{ getResourceStatus(resourceSummary.used.cpu, resourceSummary.total.cpu) }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Memory Usage -->
+        <div class="col-lg-6 col-md-12">
+          <div class="resource-item">
+            <div class="resource-header">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-memory text-success me-2"></i>
+                <h6 class="mb-0">Memoria RAM</h6>
+                <span *ngIf="isCritical(resourceSummary.used.memory, resourceSummary.total.memory)" 
+                      class="badge bg-danger ms-2">
+                  ¡Crítico!
+                </span>
+                <span *ngIf="isWarning(resourceSummary.used.memory, resourceSummary.total.memory)" 
+                      class="badge bg-warning ms-2">
+                  Advertencia
+                </span>
+              </div>
+              <div class="resource-values">
+                <span class="current-usage">
+                  {{ formatMemory(resourceSummary.used.memory) }} / {{ formatMemory(resourceSummary.total.memory) }}
+                </span>
+                <span class="usage-percentage">
+                  {{ getUsagePercentage(resourceSummary.used.memory, resourceSummary.total.memory) }}%
+                </span>
+              </div>
+            </div>
+            
+            <div class="progress mb-2" style="height: 8px;">
+              <div class="progress-bar" 
+                   [ngClass]="getProgressBarClass(getUsagePercentage(resourceSummary.used.memory, resourceSummary.total.memory))"
+                   [style.width.%]="getUsagePercentage(resourceSummary.used.memory, resourceSummary.total.memory)">
+              </div>
+            </div>
+            
+            <small class="text-muted">
+              {{ getResourceStatus(resourceSummary.used.memory, resourceSummary.total.memory) }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Disk Usage -->
+        <div class="col-lg-6 col-md-12">
+          <div class="resource-item">
+            <div class="resource-header">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-hdd text-warning me-2"></i>
+                <h6 class="mb-0">Almacenamiento SSD</h6>
+                <span *ngIf="isCritical(resourceSummary.used.disk, resourceSummary.total.disk)" 
+                      class="badge bg-danger ms-2">
+                  ¡Crítico!
+                </span>
+                <span *ngIf="isWarning(resourceSummary.used.disk, resourceSummary.total.disk)" 
+                      class="badge bg-warning ms-2">
+                  Advertencia
+                </span>
+              </div>
+              <div class="resource-values">
+                <span class="current-usage">
+                  {{ resourceSummary.used.disk }} GB / {{ resourceSummary.total.disk }} GB
+                </span>
+                <span class="usage-percentage">
+                  {{ getUsagePercentage(resourceSummary.used.disk, resourceSummary.total.disk) }}%
+                </span>
+              </div>
+            </div>
+            
+            <div class="progress mb-2" style="height: 8px;">
+              <div class="progress-bar" 
+                   [ngClass]="getProgressBarClass(getUsagePercentage(resourceSummary.used.disk, resourceSummary.total.disk))"
+                   [style.width.%]="getUsagePercentage(resourceSummary.used.disk, resourceSummary.total.disk)">
+              </div>
+            </div>
+            
+            <small class="text-muted">
+              {{ getResourceStatus(resourceSummary.used.disk, resourceSummary.total.disk) }}
+            </small>
+          </div>
+        </div>
+
+        <!-- VMs Usage -->
+        <div class="col-lg-6 col-md-12">
+          <div class="resource-item">
+            <div class="resource-header">
+              <div class="d-flex align-items-center">
+                <i class="fas fa-server text-info me-2"></i>
+                <h6 class="mb-0">Máquinas Virtuales</h6>
+                <span *ngIf="isCritical(resourceSummary.used.currentVMs, resourceSummary.total.maxVMs)" 
+                      class="badge bg-danger ms-2">
+                  ¡Crítico!
+                </span>
+                <span *ngIf="isWarning(resourceSummary.used.currentVMs, resourceSummary.total.maxVMs)" 
+                      class="badge bg-warning ms-2">
+                  Advertencia
+                </span>
+              </div>
+              <div class="resource-values">
+                <span class="current-usage">
+                  {{ resourceSummary.used.currentVMs }} / {{ resourceSummary.total.maxVMs }}
+                </span>
+                <span class="usage-percentage">
+                  {{ getUsagePercentage(resourceSummary.used.currentVMs, resourceSummary.total.maxVMs) }}%
+                </span>
+              </div>
+            </div>
+            
+            <div class="progress mb-2" style="height: 8px;">
+              <div class="progress-bar" 
+                   [ngClass]="getProgressBarClass(getUsagePercentage(resourceSummary.used.currentVMs, resourceSummary.total.maxVMs))"
+                   [style.width.%]="getUsagePercentage(resourceSummary.used.currentVMs, resourceSummary.total.maxVMs)">
+              </div>
+            </div>
+            
+            <small class="text-muted">
+              {{ getResourceStatus(resourceSummary.used.currentVMs, resourceSummary.total.maxVMs) }}
+            </small>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Recommendations -->
+    <div class="recommendations mt-4" *ngIf="getRecommendations() as recommendations">
+      <h6 class="mb-3">
+        <i class="fas fa-lightbulb text-warning me-2"></i>
+        Recomendaciones
+      </h6>
+      <div class="alert alert-info" role="alert">
+        <ul class="mb-0">
+          <li *ngFor="let recommendation of recommendations">
+            {{ recommendation }}
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions mt-4">
+      <div class="row g-2">
+        
+        <!-- Create VM Check -->
+        <div class="col-md-6">
+          <div class="quick-action-card">
+            <h6 class="mb-2">
+              <i class="fas fa-plus-circle text-primary me-2"></i>
+              Verificar Recursos para Nueva VM
+            </h6>
+            <div class="row g-2">
+              <div class="col-4">
+                <input type="number" 
+                       class="form-control form-control-sm" 
+                       placeholder="CPU" 
+                       #cpuInput 
+                       min="1" 
+                       max="16" 
+                       value="2">
+              </div>
+              <div class="col-4">
+                <input type="number" 
+                       class="form-control form-control-sm" 
+                       placeholder="RAM (MB)" 
+                       #memoryInput 
+                       min="512" 
+                       max="32768" 
+                       step="512" 
+                       value="2048">
+              </div>
+              <div class="col-4">
+                <input type="number" 
+                       class="form-control form-control-sm" 
+                       placeholder="Disco (GB)" 
+                       #diskInput 
+                       min="10" 
+                       max="1000" 
+                       step="10" 
+                       value="50">
+              </div>
+            </div>
+            <button type="button" 
+                    class="btn btn-outline-primary btn-sm mt-2"
+                    (click)="canCreateVM(+cpuInput.value, +memoryInput.value, +diskInput.value)">
+              <i class="fas fa-check-circle me-1"></i>
+              Verificar Disponibilidad
+            </button>
+          </div>
+        </div>
+
+        <!-- Plan Actions -->
+        <div class="col-md-6" *ngIf="showUpgradeButton">
+          <div class="quick-action-card">
+            <h6 class="mb-2">
+              <i class="fas fa-arrow-up text-success me-2"></i>
+              Gestión de Plan
+            </h6>
+            <p class="mb-2 text-muted small">
+              <span *ngIf="userSubscription">
+                Plan actual: <strong>{{ userSubscription.plan?.name }}</strong>
+              </span>
+            </p>
+            <div class="btn-group btn-group-sm" role="group">
+              <button type="button" 
+                      class="btn btn-outline-success"
+                      (click)="upgradePlan()">
+                <i class="fas fa-rocket me-1"></i>
+                Actualizar Plan
+              </button>
+              <button type="button" 
+                      class="btn btn-outline-primary"
+                      routerLink="/dashboard">
+                <i class="fas fa-tachometer-alt me-1"></i>
+                Dashboard
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- VM Creation Quick Test Widget -->
+<div class="vm-test-widget mt-3" *ngIf="resourceSummary">
+  <div class="card border-info">
+    <div class="card-header bg-info text-white">
+      <h6 class="card-title mb-0">
+        <i class="fas fa-flask me-2"></i>
+        Prueba Rápida de Recursos
+      </h6>
+    </div>
+    <div class="card-body">
+      <p class="mb-3">
+        Prueba configuraciones comunes de VMs para ver si puedes crearlas:
+      </p>
+      
+      <div class="row g-2">
+        
+        <!-- Small VM -->
+        <div class="col-md-4">
+          <div class="test-vm-card" (click)="canCreateVM(1, 1024, 20)">
+            <div class="test-vm-icon">
+              <i class="fas fa-laptop"></i>
+            </div>
+            <div class="test-vm-specs">
+              <strong>VM Pequeña</strong><br>
+              <small>1 CPU, 1GB RAM, 20GB</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Medium VM -->
+        <div class="col-md-4">
+          <div class="test-vm-card" (click)="canCreateVM(2, 2048, 50)">
+            <div class="test-vm-icon">
+              <i class="fas fa-desktop"></i>
+            </div>
+            <div class="test-vm-specs">
+              <strong>VM Mediana</strong><br>
+              <small>2 CPU, 2GB RAM, 50GB</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Large VM -->
+        <div class="col-md-4">
+          <div class="test-vm-card" (click)="canCreateVM(4, 4096, 100)">
+            <div class="test-vm-icon">
+              <i class="fas fa-server"></i>
+            </div>
+            <div class="test-vm-specs">
+              <strong>VM Grande</strong><br>
+              <small>4 CPU, 4GB RAM, 100GB</small>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div> 

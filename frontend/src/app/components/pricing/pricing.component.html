@@ -1,0 +1,235 @@
+<!-- Header de Pricing -->
+<div class="page-header text-center">
+  <div class="container">
+    <h1 class="display-4">
+      <i class="fas fa-server me-3"></i>
+      Planes de Hardware
+    </h1>
+    <p class="lead">
+      Elige el plan perfecto para tus máquinas virtuales. Recursos escalables y flexibles.
+    </p>
+    
+    <!-- Selector de Ciclo de Facturación -->
+    <div class="billing-toggle mt-4">
+      <div class="btn-group" role="group">
+        <input type="radio" class="btn-check" name="billingCycle" id="monthly" 
+               [checked]="selectedBillingCycle === 'monthly'" 
+               (change)="changeBillingCycle('monthly')">
+        <label class="btn btn-outline-primary" for="monthly">
+          <i class="fas fa-calendar-alt me-2"></i>
+          Mensual
+        </label>
+        
+        <input type="radio" class="btn-check" name="billingCycle" id="yearly" 
+               [checked]="selectedBillingCycle === 'yearly'" 
+               (change)="changeBillingCycle('yearly')">
+        <label class="btn btn-outline-primary" for="yearly">
+          <i class="fas fa-calendar me-2"></i>
+          Anual
+          <span class="badge bg-success ms-2">Ahorra 20%</span>
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Planes de Hardware -->
+<div class="container py-5">
+  
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-state text-center">
+    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Cargando planes...</span>
+    </div>
+    <p class="mt-3 text-muted">Cargando planes de hardware...</p>
+  </div>
+
+  <!-- Planes Grid -->
+  <div *ngIf="!isLoading" class="row g-4">
+    <div *ngFor="let plan of plans; let i = index" class="col-lg-4 col-md-6 d-flex">
+      
+      <!-- Plan Card -->
+      <div class="card plan-card w-100" 
+           [class.is-popular]="plan.isPopular"
+           [class.is-current]="isCurrentPlan(plan)">
+        
+        <div class="position-relative">
+          <!-- Popular Badge -->
+          <div *ngIf="plan.isPopular" class="position-absolute top-0 start-50 translate-middle-x mt-n3">
+            <span class="popular-badge badge rounded-pill px-3 py-2">
+              <i class="fas fa-star me-1"></i>
+              Más Popular
+            </span>
+          </div>
+        </div>
+
+        <!-- Card Header -->
+        <div class="card-header text-center">
+          <!-- Plan Icon -->
+          <div class="plan-icon" [style.color]="plan.color || '#0d6efd'">
+            <i [class]="plan.icon || 'fas fa-server'"></i>
+          </div>
+          
+          <!-- Plan Name -->
+          <h3 class="card-title">{{ plan.name }}</h3>
+          <p class="card-text">{{ plan.description }}</p>
+        </div>
+
+        <!-- Card Body -->
+        <div class="card-body d-flex flex-column">
+          
+          <!-- Pricing -->
+          <div class="price-display text-center">
+            <span class="price">{{ getPriceText(plan) }}</span>
+            <span class="billing-cycle">/ {{ selectedBillingCycle === 'monthly' ? 'mes' : 'año' }}</span>
+            
+            <!-- Yearly Discount -->
+            <div *ngIf="selectedBillingCycle === 'yearly' && getYearlyDiscountText(plan)" class="text-success mt-1">
+              <small class="fw-bold">
+                <i class="fas fa-tag me-1"></i>
+                {{ getYearlyDiscountText(plan) }}
+              </small>
+            </div>
+            
+            <!-- Original yearly price comparison -->
+            <div *ngIf="selectedBillingCycle === 'yearly' && plan.monthlyPrice" class="text-muted mt-1">
+              <small>
+                <del>{{ hardwarePlanService.formatPrice(plan.monthlyPrice * 12) }}/año</del>
+              </small>
+            </div>
+          </div>
+
+          <!-- Resource Specifications -->
+          <div class="resource-specs my-4">
+            <div class="row g-2">
+              <div class="col-6">
+                <div class="spec-item text-center">
+                  <i class="fas fa-microchip text-primary"></i>
+                  <div class="fw-bold">{{ plan.totalCpu }}</div>
+                  <small class="text-muted">vCPU</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="spec-item text-center">
+                  <i class="fas fa-memory text-success"></i>
+                  <div class="fw-bold">{{ formatMemory(plan.totalMemory) }}</div>
+                  <small class="text-muted">RAM</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="spec-item text-center">
+                  <i class="fas fa-hdd text-warning"></i>
+                  <div class="fw-bold">{{ plan.totalDisk }} GB</div>
+                  <small class="text-muted">SSD</small>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="spec-item text-center">
+                  <i class="fas fa-server text-info"></i>
+                  <div class="fw-bold">{{ plan.maxVMs }}</div>
+                  <small class="text-muted">VMs</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Features List -->
+          <div class="features-list mt-auto">
+            <ul class="list-unstyled">
+              <li *ngFor="let feature of plan.features">
+                <i class="fas fa-check-circle"></i>
+                <span>{{ feature }}</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer text-center">
+          <button type="button" 
+                  [class]="getButtonClass(plan)"
+                  [disabled]="isButtonDisabled(plan)"
+                  (click)="selectPlan(plan)">
+            <span *ngIf="processingPayments.has(plan.id)" class="spinner-border spinner-border-sm me-2"></span>
+            {{ getButtonText(plan) }}
+            <i *ngIf="!isCurrentPlan(plan) && !processingPayments.has(plan.id)" class="fas fa-arrow-right ms-2"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && plans.length === 0" class="empty-state text-center">
+    <i class="fas fa-server fa-3x text-muted mb-3"></i>
+    <h3 class="text-muted">No hay planes disponibles</h3>
+    <p class="text-muted">Los planes de hardware se están configurando. Vuelve pronto.</p>
+    <button type="button" class="btn btn-primary" (click)="loadPlans()">
+      <i class="fas fa-sync-alt me-2"></i>
+      Recargar
+    </button>
+  </div>
+</div>
+
+<!-- Help Section -->
+<div class="help-section text-center mt-5">
+  <div class="container">
+    <h3 class="mb-3">¿Necesitas ayuda para elegir?</h3>
+    <p class="lead mb-4">
+      Nuestro equipo puede ayudarte a encontrar el plan perfecto para tus necesidades.
+    </p>
+    <div class="btn-group" role="group">
+      <a href="https://wa.me/+5491234567890" target="_blank" class="btn btn-success">
+        <i class="fab fa-whatsapp me-2"></i>
+        Contactar por WhatsApp
+      </a>
+      <a href="mailto:ventas@argcloud.com" class="btn btn-outline-light">
+        <i class="fas fa-envelope me-2"></i>
+        Enviar un Email
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Current Subscription Info (si el usuario está logueado y tiene suscripción) -->
+<div *ngIf="isLoggedIn && currentSubscription" class="container py-5">
+  <div class="row">
+    <div class="col-12">
+      <div class="card border-info">
+        <div class="card-header bg-info text-white">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            Tu Suscripción Actual
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <p><strong>Plan:</strong> {{ currentSubscription.plan?.name }}</p>
+              <p><strong>Estado:</strong> 
+                <span class="badge bg-success" *ngIf="currentSubscription.status === 'active'">Activo</span>
+                <span class="badge bg-warning" *ngIf="currentSubscription.status === 'pending'">Pendiente</span>
+                <span class="badge bg-danger" *ngIf="currentSubscription.status === 'cancelled'">Cancelado</span>
+              </p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Próxima facturación:</strong> {{ currentSubscription.nextBillingDate | date:'dd/MM/yyyy' }}</p>
+              <p><strong>Tipo:</strong> {{ currentSubscription.subscriptionType === 'monthly' ? 'Mensual' : 'Anual' }}</p>
+            </div>
+          </div>
+          <div class="mt-3">
+            <button type="button" class="btn btn-outline-primary me-2" routerLink="/dashboard">
+              <i class="fas fa-tachometer-alt me-2"></i>
+              Ver Dashboard
+            </button>
+            <button type="button" class="btn btn-outline-secondary" routerLink="/account">
+              <i class="fas fa-cog me-2"></i>
+              Gestionar Suscripción
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

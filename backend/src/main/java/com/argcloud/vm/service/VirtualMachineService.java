@@ -3,9 +3,12 @@ package com.argcloud.vm.service;
 import com.argcloud.vm.dto.VirtualMachineRequest;
 import com.argcloud.vm.dto.VirtualMachineResponse;
 import com.argcloud.vm.entity.User;
+import com.argcloud.vm.entity.UserSubscription;
 import com.argcloud.vm.entity.VirtualMachine;
+import com.argcloud.vm.entity.HardwarePlan;
 import com.argcloud.vm.repository.VirtualMachineRepository;
 import com.argcloud.vm.repository.UserRepository;
+import com.argcloud.vm.repository.UserSubscriptionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,13 +30,16 @@ public class VirtualMachineService {
     private final VirtualMachineRepository vmRepository;
     private final UserRepository userRepository;
     private final ExternalApiService externalApiService;
+    private final UserSubscriptionRepository userSubscriptionRepository;
     
     public VirtualMachineService(VirtualMachineRepository vmRepository,
                                UserRepository userRepository,
-                               @Qualifier("proxmoxApiService") ExternalApiService externalApiService) {
+                               @Qualifier("proxmoxApiService") ExternalApiService externalApiService,
+                               UserSubscriptionRepository userSubscriptionRepository) {
         this.vmRepository = vmRepository;
         this.userRepository = userRepository;
         this.externalApiService = externalApiService;
+        this.userSubscriptionRepository = userSubscriptionRepository;
     }
     
     /**
@@ -44,10 +51,31 @@ public class VirtualMachineService {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
             
+            // Verificar suscripción activa y límites de recursos
+            UserSubscription subscription = userSubscriptionRepository.findActiveSubscriptionByUserId(userId, LocalDateTime.now())
+                    .orElseThrow(() -> new RuntimeException("No tienes una suscripción activa."));
+
+            HardwarePlan plan = subscription.getPlan();
+
+            // Validar límites de recursos
+            if (subscription.getUsedCpu() + request.getCpu() > plan.getTotalCpu() ||
+                subscription.getUsedMemory() + request.getMemory() > plan.getTotalMemory() ||
+                subscription.getUsedDisk() + request.getDisk() > plan.getTotalDisk() ||
+                subscription.getCurrentVMs() + 1 > plan.getMaxVMs()) {
+                throw new RuntimeException("La creación de la VM excede los límites de tu plan.");
+            }
+            
             // Verificar que no existe una VM con el mismo nombre para este usuario
             if (vmRepository.existsByNameAndUser(request.getName(), user)) {
                 throw new RuntimeException("Ya existe una máquina virtual con ese nombre");
             }
+            
+            // Actualizar los recursos utilizados en la suscripción
+            subscription.setUsedCpu(subscription.getUsedCpu() + request.getCpu());
+            subscription.setUsedMemory(subscription.getUsedMemory() + request.getMemory());
+            subscription.setUsedDisk(subscription.getUsedDisk() + request.getDisk());
+            subscription.setCurrentVMs(subscription.getCurrentVMs() + 1);
+            userSubscriptionRepository.save(subscription);
             
             // Crear la entidad en la base de datos
             VirtualMachine vm = new VirtualMachine(
@@ -82,6 +110,16 @@ public class VirtualMachineService {
                                 // Marcar como error si falla la creación externa
                                 savedVm.setStatus(VirtualMachine.VMStatus.ERROR);
                                 vmRepository.save(savedVm);
+                                
+                                // Liberar recursos de la suscripción
+                                userSubscriptionRepository.findActiveSubscriptionByUserId(userId, LocalDateTime.now()).ifPresent(s -> {
+                                    s.setUsedCpu(s.getUsedCpu() - request.getCpu());
+                                    s.setUsedMemory(s.getUsedMemory() - request.getMemory());
+                                    s.setUsedDisk(s.getUsedDisk() - request.getDisk());
+                                    s.setCurrentVMs(s.getCurrentVMs() - 1);
+                                    userSubscriptionRepository.save(s);
+                                });
+
                                 logger.error("Error creando VM externa: {}", error.getMessage());
                             }
                     );
@@ -238,53 +276,81 @@ public class VirtualMachineService {
      */
     public void deleteVirtualMachine(Long vmId, Long userId) {
         VirtualMachine vm = getVmAndValidateOwnership(vmId, userId);
-        
+
         // Marcar como eliminando
         vm.setStatus(VirtualMachine.VMStatus.DELETING);
         final VirtualMachine finalVm = vmRepository.save(vm);
-        
+
         // Si tiene ID externo, eliminar del sistema externo
         if (finalVm.getExternalId() != null) {
             externalApiService.deleteVirtualMachine(finalVm.getExternalId())
                     .subscribe(
                             success -> {
-                                // Eliminar de la base de datos independientemente del resultado
-                                vmRepository.delete(finalVm);
-                                logger.info("VM {} eliminada", finalVm.getId());
+                                if (success) {
+                                    // Liberar recursos de la suscripción
+                                    userSubscriptionRepository.findActiveSubscriptionByUserId(userId, LocalDateTime.now()).ifPresent(subscription -> {
+                                        subscription.setUsedCpu(subscription.getUsedCpu() - finalVm.getCpu());
+                                        subscription.setUsedMemory(subscription.getUsedMemory() - finalVm.getMemory());
+                                        subscription.setUsedDisk(subscription.getUsedDisk() - finalVm.getDisk());
+                                        subscription.setCurrentVMs(subscription.getCurrentVMs() - 1);
+                                        userSubscriptionRepository.save(subscription);
+                                    });
+
+                                    // Si la eliminación externa es exitosa, eliminar de la BD local
+                                    vmRepository.delete(finalVm);
+                                    logger.info("VM {} eliminada de la BD", finalVm.getId());
+                                } else {
+                                    finalVm.setStatus(VirtualMachine.VMStatus.ERROR);
+                                    vmRepository.save(finalVm);
+                                    logger.error("Error eliminando VM {} del sistema externo", finalVm.getId());
+                                }
                             },
                             error -> {
-                                // Eliminar de la base de datos aunque falle la eliminación externa
-                                vmRepository.delete(finalVm);
-                                logger.error("Error eliminando VM externa, pero eliminada de BD: {}", error.getMessage());
+                                // Si falla, marcar como error
+                                finalVm.setStatus(VirtualMachine.VMStatus.ERROR);
+                                vmRepository.save(finalVm);
+                                logger.error("Error eliminando VM {} del sistema externo: {}", 
+                                        finalVm.getId(), error.getMessage());
                             }
                     );
         } else {
-            // Si no tiene ID externo, eliminar directamente de la BD
+            // Si no tiene ID externo, eliminar directamente y liberar recursos
+            userSubscriptionRepository.findActiveSubscriptionByUserId(userId, LocalDateTime.now()).ifPresent(subscription -> {
+                subscription.setUsedCpu(subscription.getUsedCpu() - vm.getCpu());
+                subscription.setUsedMemory(subscription.getUsedMemory() - vm.getMemory());
+                subscription.setUsedDisk(subscription.getUsedDisk() - vm.getDisk());
+                subscription.setCurrentVMs(subscription.getCurrentVMs() - 1);
+                userSubscriptionRepository.save(subscription);
+            });
             vmRepository.delete(finalVm);
-            logger.info("VM {} eliminada (solo BD)", finalVm.getId());
+            logger.info("VM {} sin ID externo, eliminada de la BD", finalVm.getId());
         }
     }
     
     /**
-     * Sincroniza el estado de una máquina virtual con el sistema externo.
+     * Sincroniza el estado de una máquina virtual.
      */
     public VirtualMachineResponse syncVirtualMachineStatus(Long vmId, Long userId) {
-        final VirtualMachine vm = getVmAndValidateOwnership(vmId, userId);
+        VirtualMachine vm = getVmAndValidateOwnership(vmId, userId);
         
         if (vm.getExternalId() == null) {
-            throw new RuntimeException("La máquina virtual no tiene ID externo");
+            throw new RuntimeException("La máquina virtual no tiene ID externo, no se puede sincronizar");
         }
         
         // Obtener estado del sistema externo
         externalApiService.getVirtualMachineStatus(vm.getExternalId())
                 .subscribe(
                         status -> {
+                            // Actualizar el estado en la base de datos
                             vm.setStatus(status);
                             vmRepository.save(vm);
-                            logger.info("Estado de VM {} sincronizado: {}", vm.getId(), status);
+                            logger.info("Estado de VM {} sincronizado a {}", vm.getId(), status);
                         },
                         error -> {
                             logger.error("Error sincronizando estado de VM {}: {}", vm.getId(), error.getMessage());
+                            // Opcional: marcar la VM con un estado de error
+                            vm.setStatus(VirtualMachine.VMStatus.ERROR);
+                            vmRepository.save(vm);
                         }
                 );
         
@@ -303,6 +369,7 @@ public class VirtualMachineService {
         VirtualMachine vm = vmRepository.findById(vmId)
                 .orElseThrow(() -> new RuntimeException("Máquina virtual no encontrada"));
         
+        // Verificar que pertenece al usuario
         if (!vm.getUser().getId().equals(userId)) {
             throw new RuntimeException("No tienes permisos para acceder a esta máquina virtual");
         }

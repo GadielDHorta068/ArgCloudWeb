@@ -91,6 +91,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.router.navigate(['/virtual-machines']);
   }
 
+  /** Navega a la página de planes de hardware. */
+  navigatePricing(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+    }
+    this.router.navigate(['/pricing']);
+  }
+
   /** Cierra la sesión del usuario y lo redirige a la página de inicio. */
   logout(event?: Event): void {
     if (event) {

@@ -1,6 +1,6 @@
 # ArgCloud - Plataforma de Máquinas Virtuales
 
-ArgCloud es una plataforma completa para la gestión de máquinas virtuales en la nube, desarrollada con Angular (frontend) y Spring Boot (backend), usando PostgreSQL como base de datos.
+ArgCloud es una plataforma completa para la gestión de máquinas virtuales en la nube, desarrollada con Angular (frontend) y Spring Boot (backend), usando PostgreSQL como base de datos. Incluye un sistema completo de planes de hardware parametrizables con pagos integrados vía Mercado Pago.
 
 ## 🚀 Características
 
@@ -10,6 +10,10 @@ ArgCloud es una plataforma completa para la gestión de máquinas virtuales en l
 - **Autenticación JWT**: Sistema de autenticación seguro
 - **Verificación por email**: Registro seguro con confirmación
 - **Gestión completa de VMs**: Crear, administrar y monitorear máquinas virtuales
+- **Sistema de Planes de Hardware**: Planes parametrizables con recursos específicos
+- **Pagos con Mercado Pago**: Integración completa con CardForm y webhooks
+- **Gestión de Suscripciones**: Control de recursos y facturación
+- **Dashboard de Recursos**: Monitoreo en tiempo real del uso de recursos
 - **Integración con Proxmox**: Conectividad directa con servidores Proxmox VE
 - **Docker**: Despliegue con contenedores
 - **Arquitectura Business-Repository-Presenter**: Código limpio y mantenible
@@ -33,6 +37,7 @@ ArgCloud es una plataforma completa para la gestión de máquinas virtuales en l
 - JWT (JSON Web Tokens)
 - BCrypt para hash de contraseñas
 - JavaMail para envío de emails
+- Mercado Pago SDK
 
 ### Infraestructura
 - Proxmox VE (virtualización)
@@ -43,6 +48,7 @@ ArgCloud es una plataforma completa para la gestión de máquinas virtuales en l
 
 - Docker y Docker Compose instalados
 - Git
+- Cuenta de Mercado Pago (para pagos)
 - Servidor Proxmox VE (opcional para funcionalidad completa)
 - Router MikroTik (opcional para gestión de red)
 
@@ -57,35 +63,51 @@ cd LandingPage
 
 ### 2. Configurar variables de entorno
 
-Edita el archivo `docker-compose.yml` y configura las variables de email:
+Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
 
-```yaml
-- MAIL_HOST=smtp.gmail.com
-- MAIL_PORT=587
-- MAIL_USERNAME=tu-email@gmail.com
-- MAIL_PASSWORD=tu-app-password
+```env
+# Base de datos
+DB_NAME=argcloud_db
+DB_USERNAME=argcloud_user
+DB_PASSWORD=tu_password_seguro
+
+# JWT
+JWT_SECRET=8q2HdS}$250z
+JWT_EXPIRATION=86400
+
+# Email (para Gmail, necesitas una "App Password")
+MAIL_USERNAME=tu-email@gmail.com
+MAIL_PASSWORD=tu-app-password
+
+# MERCADO PAGO (OBLIGATORIO para pagos)
+# Obtén estas credenciales en: https://www.mercadopago.com.ar/developers/panel
+MERCADOPAGO_ACCESS_TOKEN=TEST-tu-access-token
+MERCADOPAGO_PUBLIC_KEY=TEST-tu-public-key
+MERCADOPAGO_WEBHOOK_SECRET=tu-webhook-secret
+MERCADOPAGO_ENVIRONMENT=sandbox
+
+# URLs de tu aplicación
+FRONTEND_URL=http://localhost:4200
+BACKEND_URL=http://localhost:8080
+
+# Proxmox (Opcional)
+PROXMOX_URL=https://tu-servidor-proxmox:8006
+PROXMOX_USERNAME=root@pam
+PROXMOX_PASSWORD=tu-password
+
+# MikroTik (Opcional)
+MIKROTIK_URL=https://tu-router-mikrotik
+MIKROTIK_USERNAME=admin
+MIKROTIK_PASSWORD=tu-password
 ```
 
-**Nota**: Para Gmail, necesitas generar una "Contraseña de aplicación" en la configuración de seguridad de tu cuenta.
+### 3. Configurar Mercado Pago
 
-### 3. Configurar APIs externas (Opcional)
+Para habilitar los pagos, necesitas:
 
-Edita `backend/src/main/resources/application.properties` para configurar la integración con Proxmox y MikroTik:
-
-```properties
-# Proxmox VE Configuration
-external.api.proxmox.url=https://tu-servidor-proxmox:8006
-external.api.proxmox.username=root@pam
-external.api.proxmox.password=tu-password
-
-# MikroTik Configuration
-external.api.mikrotik.url=https://tu-router-mikrotik
-external.api.mikrotik.username=admin
-external.api.mikrotik.password=tu-password
-
-# API Client Configuration
-external.api.timeout=30000
-```
+1. **Crear cuenta en Mercado Pago**: https://www.mercadopago.com.ar
+2. **Obtener credenciales**: Ve a Developers → Panel → Credenciales
+3. **Configurar webhooks**: URL de notificación: `http://tu-dominio/api/payments/webhook`
 
 ### 4. Ejecutar con Docker Compose
 
@@ -104,6 +126,66 @@ Este comando:
 - **Backend API**: http://localhost:8080
 - **Base de datos**: localhost:5432
 
+## 💳 Sistema de Planes de Hardware
+
+### Características del Sistema
+
+ArgCloud incluye un sistema completo de planes de hardware parametrizables:
+
+#### 🎯 **Gestión de Planes**
+- **Planes parametrizables**: CPU, RAM, disco, VMs máximas, ancho de banda
+- **Precios flexibles**: Mensual y anual con descuentos automáticos
+- **Características personalizables**: Features, colores, iconos
+- **Niveles de soporte**: Básico, Estándar, Premium
+
+#### 💰 **Sistema de Pagos**
+- **Integración con Mercado Pago**: CardForm oficial con validación automática
+- **Múltiples métodos**: Tarjetas de crédito/débito, transferencias
+- **Webhooks**: Sincronización automática de estados de pago
+- **Protocolo 3DS 2.0**: Seguridad avanzada
+
+#### 📊 **Gestión de Suscripciones**
+- **Control de recursos**: Tracking en tiempo real de CPU, RAM, disco, VMs
+- **Distribución inteligente**: Un plan de 4GB permite 4 VMs de 1GB cada una
+- **Facturación automática**: Renovación mensual/anual
+- **Estados de suscripción**: Activa, Pendiente, Cancelada, Expirada
+
+### Modelo de Datos - Planes
+
+```typescript
+interface HardwarePlan {
+  id: number;
+  name: string;
+  description: string;
+  monthlyPrice: number;      // Precio mensual en pesos
+  yearlyPrice: number;       // Precio anual con descuento
+  totalCpu: number;          // CPU cores disponibles
+  totalMemory: number;       // RAM en MB
+  totalDisk: number;         // Almacenamiento en GB
+  maxVMs: number;            // Máximo de VMs
+  monthlyBandwidth: number;  // Ancho de banda en GB
+  supportLevel: 'basic' | 'standard' | 'premium';
+  features: string[];        // Características incluidas
+  color: string;             // Color del tema
+  icon: string;              // Icono FontAwesome
+  isActive: boolean;
+  isPopular: boolean;
+}
+```
+
+### Acceso a Planes y Pagos
+
+#### 🔗 **Puntos de entrada:**
+1. **Header**: Clic en "Planes" (visible desde cualquier página)
+2. **Dashboard**: Botón "Ver Planes" en acciones rápidas
+3. **URL directa**: `/pricing`
+
+#### 💳 **Flujo de compra:**
+1. **Explorar planes** → Página con comparación de planes
+2. **Seleccionar plan** → Clic en "Seleccionar Plan"
+3. **Pago seguro** → CardForm de Mercado Pago integrado
+4. **Confirmación** → Activación automática del plan
+
 ## 🖥️ Gestión de Máquinas Virtuales
 
 ### Características Principales
@@ -111,25 +193,25 @@ Este comando:
 ArgCloud ofrece una gestión completa de máquinas virtuales con las siguientes funcionalidades:
 
 #### 🔧 **Operaciones de VM**
-- **Crear VM**: Interfaz intuitiva para crear nuevas máquinas virtuales
+- **Crear VM**: Interfaz intuitiva con validación de recursos disponibles
 - **Iniciar/Parar**: Control completo del estado de las VMs
 - **Reiniciar**: Reinicio seguro de máquinas virtuales
 - **Eliminar**: Eliminación segura con confirmación
 - **Sincronizar**: Sincronización con el servidor Proxmox
 
 #### 📊 **Monitoreo y Estadísticas**
-- **Estado en tiempo real**: Visualización del estado actual de cada VM
-- **Recursos**: Monitoreo de CPU, RAM y almacenamiento
-- **Red**: Información de IP y MAC address
-- **Historial**: Fechas de creación y última actualización
+- **Dashboard de recursos**: Vista en tiempo real del uso vs disponible
+- **Alertas críticas**: Notificaciones cuando los recursos están al límite
+- **Verificador de VMs**: Comprueba si puedes crear una VM con recursos específicos
+- **Recomendaciones**: Sugerencias para optimizar el uso
 
 #### 🎨 **Interfaz de Usuario**
 - **Dashboard integrado**: Vista general de todas las VMs
-- **Tarjetas informativas**: Cada VM se muestra en una tarjeta con información clave
-- **Filtros y búsqueda**: Encuentra rápidamente las VMs que necesitas
+- **Resource Summary**: Componente dedicado para monitorear recursos
+- **Tarjetas informativas**: Cada VM se muestra con información completa
 - **Responsive**: Funciona perfectamente en desktop y móvil
 
-### Modelo de Datos
+### Modelo de Datos - VMs
 
 ```typescript
 interface VirtualMachine {
@@ -149,50 +231,6 @@ interface VirtualMachine {
 }
 ```
 
-### Funcionalidades por Pantalla
-
-#### 🏠 **Dashboard**
-- Vista general con estadísticas
-- Tarjetas de resumen (VMs activas, CPU total, RAM total, almacenamiento)
-- Lista rápida de VMs con acciones básicas
-- Consola simulada para VMs seleccionadas
-
-#### 🖥️ **Gestión de VMs**
-- **Crear Nueva VM**:
-  - Formulario con validación
-  - Selección de SO, recursos y nodo
-  - Configuración de red automática
-- **Lista de VMs**:
-  - Vista en tarjetas con información completa
-  - Botones de acción contextuales
-  - Estados visuales con colores
-- **Acciones Disponibles**:
-  - ▶️ Iniciar VM
-  - ⏹️ Parar VM
-  - 🔄 Reiniciar VM
-  - 🗑️ Eliminar VM
-  - 🔄 Sincronizar con Proxmox
-
-### Estados de VM
-
-| Estado | Descripción | Color | Acciones Disponibles |
-|--------|-------------|-------|---------------------|
-| `running` | VM en ejecución | 🟢 Verde | Parar, Reiniciar, Eliminar |
-| `stopped` | VM detenida | 🔴 Rojo | Iniciar, Eliminar |
-| `restarting` | VM reiniciándose | 🟡 Amarillo | Ninguna (temporal) |
-| `creating` | VM en creación | 🔵 Azul | Ninguna (temporal) |
-| `deleting` | VM eliminándose | 🟠 Naranja | Ninguna (temporal) |
-| `error` | Error en la VM | ⚫ Gris | Reiniciar, Eliminar |
-
-### Integración con Proxmox
-
-ArgCloud se integra directamente con servidores Proxmox VE para:
-
-- **Sincronización automática**: Las VMs se sincronizan automáticamente
-- **Gestión remota**: Control completo desde la interfaz web
-- **Monitoreo en tiempo real**: Estados actualizados automáticamente
-- **Gestión de recursos**: Asignación dinámica de CPU, RAM y almacenamiento
-
 ## 📁 Estructura del Proyecto
 
 ```
@@ -200,10 +238,33 @@ LandingPage/
 ├── backend/                    # Aplicación Spring Boot
 │   ├── src/main/java/com/argcloud/vm/
 │   │   ├── controller/        # Controladores REST
+│   │   │   ├── AuthController.java
+│   │   │   ├── DashboardController.java
+│   │   │   ├── PaymentController.java      # NEW: Gestión de pagos
+│   │   │   └── VirtualMachineController.java
 │   │   ├── service/          # Lógica de negocio
+│   │   │   ├── EmailService.java
+│   │   │   ├── MercadoPagoService.java     # NEW: Integración MP
+│   │   │   ├── UserService.java
+│   │   │   └── VirtualMachineService.java
 │   │   ├── repository/       # Acceso a datos
+│   │   │   ├── HardwarePlanRepository.java # NEW: Planes
+│   │   │   ├── PaymentRepository.java      # NEW: Pagos
+│   │   │   ├── UserRepository.java
+│   │   │   ├── UserSubscriptionRepository.java # NEW: Suscripciones
+│   │   │   └── VirtualMachineRepository.java
 │   │   ├── entity/           # Entidades JPA
+│   │   │   ├── HardwarePlan.java          # NEW: Plan de hardware
+│   │   │   ├── Payment.java               # NEW: Registro de pagos
+│   │   │   ├── User.java
+│   │   │   ├── UserSubscription.java      # NEW: Suscripción del usuario
+│   │   │   └── VirtualMachine.java
 │   │   ├── dto/              # Data Transfer Objects
+│   │   │   ├── HardwarePlanResponse.java  # NEW: Response de planes
+│   │   │   ├── PaymentRequest.java        # NEW: Request de pago
+│   │   │   ├── PaymentResponse.java       # NEW: Response de pago
+│   │   │   ├── UserSubscriptionResponse.java # NEW: Response de suscripción
+│   │   │   └── ...
 │   │   ├── config/           # Configuraciones
 │   │   └── util/             # Utilidades
 │   ├── src/main/resources/
@@ -213,13 +274,20 @@ LandingPage/
 ├── frontend/                   # Aplicación Angular
 │   ├── src/app/
 │   │   ├── components/       # Componentes Angular
-│   │   │   ├── virtual-machines/  # Gestión de VMs
-│   │   │   ├── dashboard/         # Dashboard principal
+│   │   │   ├── checkout/            # NEW: Checkout con Mercado Pago
+│   │   │   ├── dashboard/           # Dashboard principal
+│   │   │   ├── pricing/             # NEW: Página de planes
+│   │   │   ├── resource-summary/    # NEW: Dashboard de recursos
+│   │   │   ├── virtual-machines/    # Gestión de VMs
 │   │   │   └── ...
 │   │   ├── services/         # Servicios
-│   │   │   └── virtual-machine.service.ts  # Servicio de VMs
+│   │   │   ├── hardware-plan.service.ts # NEW: Servicio de planes
+│   │   │   ├── virtual-machine.service.ts
+│   │   │   └── ...
 │   │   ├── models/           # Modelos TypeScript
-│   │   │   └── virtual-machine.model.ts    # Modelo de VM
+│   │   │   ├── hardware-plan.model.ts   # NEW: Modelos de planes
+│   │   │   ├── virtual-machine.model.ts
+│   │   │   └── ...
 │   │   ├── guards/           # Guards de rutas
 │   │   └── interceptors/     # Interceptores HTTP
 │   ├── package.json
@@ -265,6 +333,50 @@ LandingPage/
 - `POST /{id}/sync` - Sincronizar con Proxmox
 - `GET /nodes` - Obtener nodos Proxmox disponibles
 
+### Planes de Hardware (`/api/plans`) - Nuevos endpoints
+- `GET /` - Listar todos los planes activos
+- `GET /{id}` - Obtener detalles de un plan específico
+- `GET /active` - Obtener solo planes activos
+- `GET /filter` - Filtrar planes por criterios
+
+### Suscripciones (`/api/subscriptions`) - Nuevos endpoints
+- `GET /current` - Obtener suscripción actual del usuario
+- `GET /history` - Historial de suscripciones
+- `GET /resources` - Resumen de recursos disponibles/utilizados
+- `POST /can-create-vm` - Verificar si se puede crear una VM
+- `GET /usage` - Estadísticas de uso de recursos
+
+### Pagos (`/api/payments`) - Nuevos endpoints
+- `GET /public-key` - Obtener clave pública de Mercado Pago
+- `POST /create` - Crear nuevo pago
+- `GET /{id}/status` - Verificar estado de un pago
+- `POST /webhook` - Webhook para notificaciones de Mercado Pago
+- `GET /history` - Historial de pagos del usuario
+
+### Ejemplo de Request - Crear Pago
+
+```json
+POST /api/payments/create
+{
+  "planId": 1,
+  "subscriptionType": "monthly",
+  "email": "usuario@example.com",
+  "additionalInfo": "Suscripción a plan Básico - monthly"
+}
+```
+
+### Ejemplo de Response - Crear Pago
+
+```json
+{
+  "checkoutUrl": "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=123456",
+  "paymentId": "pay_123456",
+  "transactionToken": "token_123456",
+  "status": "pending",
+  "subscriptionId": 1
+}
+```
+
 ### Ejemplo de Request - Crear VM
 
 ```json
@@ -279,28 +391,34 @@ POST /api/vms
 }
 ```
 
-### Ejemplo de Response - Lista de VMs
+### Ejemplo de Response - Resumen de Recursos
 
 ```json
 {
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "name": "Servidor Web Ubuntu",
-      "status": "running",
-      "os": "Ubuntu 22.04",
-      "cpu": 2,
-      "memory": 2048,
-      "disk": 50,
-      "ipAddress": "192.168.1.100",
-      "macAddress": "00:16:3e:12:34:56",
-      "nodeName": "proxmox-node-1",
-      "createdAt": "2024-01-15T10:30:00Z",
-      "updatedAt": "2024-01-20T14:45:00Z",
-      "userName": "admin"
-    }
-  ]
+  "total": {
+    "cpu": 4,
+    "memory": 8192,
+    "disk": 200,
+    "maxVMs": 5
+  },
+  "used": {
+    "cpu": 2,
+    "memory": 2048,
+    "disk": 50,
+    "currentVMs": 1
+  },
+  "available": {
+    "cpu": 2,
+    "memory": 6144,
+    "disk": 150,
+    "availableVMs": 4
+  },
+  "usage": {
+    "cpu": 50,
+    "memory": 25,
+    "disk": 25,
+    "vms": 20
+  }
 }
 ```
 
@@ -310,8 +428,10 @@ POST /api/vms
 - **Home**: Landing page con información del servicio
 - **Login**: Formulario de inicio de sesión
 - **Register**: Formulario de registro
-- **Dashboard**: Panel de administración con vista general de VMs
+- **Dashboard**: Panel de administración con vista general y acciones rápidas
 - **Virtual Machines**: Gestión completa de máquinas virtuales
+- **Pricing**: Página de planes de hardware con comparación y selección
+- **Checkout**: Formulario de pago integrado con Mercado Pago CardForm
 
 ### Características
 - Diseño responsivo con Bootstrap
@@ -322,6 +442,8 @@ POST /api/vms
 - Notificaciones toast con NGX-Toastr
 - Iconos FontAwesome
 - Animaciones y transiciones suaves
+- Integración completa con Mercado Pago
+- Dashboard de recursos en tiempo real
 
 ## ⚙️ Configuración de Desarrollo
 
@@ -355,21 +477,55 @@ Para habilitar el envío de emails de verificación:
 2. **Outlook**: Configura SMTP con tu contraseña normal
 3. **Otros**: Configura según el proveedor
 
-## 🚀 Próximas Funcionalidades
+## 💳 Configuración de Mercado Pago
 
-- [x] Gestión completa de máquinas virtuales
-- [x] Interfaz grafica para VMs
-- [x] Integración con Proxmox preparada
+### Para Sandbox (Testing)
+1. Ve a: https://www.mercadopago.com.ar/developers/panel
+2. Crea una aplicación
+3. Obtén las credenciales de **Sandbox**
+4. Configura las variables de entorno con el prefijo `TEST-`
+
+### Para Producción
+1. Completa la verificación de tu cuenta
+2. Obtén las credenciales de **Producción**
+3. Cambia `MERCADOPAGO_ENVIRONMENT=production`
+4. Configura webhooks en tu dominio real
+
+### Webhooks
+El sistema maneja automáticamente las notificaciones de Mercado Pago:
+- **URL**: `https://tu-dominio.com/api/payments/webhook`
+- **Eventos**: `payment.created`, `payment.updated`
+
+## 🚀 Funcionalidades Completadas
+
+- [x] **Gestión completa de máquinas virtuales**
+- [x] **Interfaz gráfica para VMs**
+- [x] **Integración con Proxmox preparada**
+- [x] **Términos y condiciones**
+- [x] **Sistema de planes de hardware parametrizables**
+- [x] **Integración completa con Mercado Pago**
+- [x] **Gestión de suscripciones y facturación**
+- [x] **Dashboard de recursos en tiempo real**
+- [x] **Control de límites por usuario**
+- [x] **CardForm de Mercado Pago con validación automática**
+- [x] **Webhooks para sincronización de pagos**
+- [x] **Sistema de distribución inteligente de recursos**
+- [x] **Verificación de recursos antes de crear VMs**
+
+## 🔮 Próximas Funcionalidades
+
 - [ ] Monitoreo en tiempo real con WebSockets
 - [ ] Configuración avanzada de recursos
 - [ ] Sistema de plantillas de VM
 - [ ] Backup y restauración automática
 - [ ] Dashboard con métricas avanzadas
 - [ ] API para gestión programática
-- [ ] Sistema de facturación
 - [ ] Snapshots de VMs
 - [ ] Migración entre nodos
 - [ ] Consola VNC integrada
+- [ ] Alertas automáticas por email/WhatsApp
+- [ ] Sistema de tickets de soporte
+- [ ] Métricas de performance en tiempo real
 
 ## 📝 Licencia
 
@@ -379,6 +535,7 @@ Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
 
 Para soporte técnico o consultas:
 - Email: soporte@argcloud.com
+- WhatsApp: +54 9 11 2345-6789
 - Documentación: [Wiki del proyecto]
 - Issues: [GitHub Issues]
 
