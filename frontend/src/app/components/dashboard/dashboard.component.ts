@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
+import { HardwarePlanService } from '../../services/hardware-plan.service';
 import { User } from '../../models/user.model';
 import { VirtualMachine } from '../../models/virtual-machine.model';
+import { UserSubscription } from '../../models/hardware-plan.model';
+import { ToastrService } from 'ngx-toastr';
 
 /**
  * Componente del panel de control del usuario.
@@ -17,11 +20,17 @@ import { VirtualMachine } from '../../models/virtual-machine.model';
 export class DashboardComponent implements OnInit {
   /** El usuario actualmente autenticado. */
   currentUser: User | null = null;
+  /** Suscripción activa del usuario */
+  currentSubscription: UserSubscription | null = null;
+  /** Estado de carga de la suscripción */
+  isLoadingSubscription = false;
   virtualMachines: VirtualMachine[] = [];
   selectedMachine: VirtualMachine | null = null;
 
   constructor(
     private authService: AuthService,
+    private hardwarePlanService: HardwarePlanService,
+    private toastr: ToastrService,
     private http: HttpClient
   ) { }
 
@@ -34,7 +43,59 @@ export class DashboardComponent implements OnInit {
 
     // Obtener mensaje de bienvenida del backend
     this.getDashboardData();
+    this.loadCurrentSubscription();
     this.loadVirtualMachines();
+  }
+
+  /**
+   * Carga la suscripción activa del usuario.
+   */
+  loadCurrentSubscription(): void {
+    this.isLoadingSubscription = true;
+    this.hardwarePlanService.getCurrentSubscription().subscribe({
+      next: (subscription) => {
+        this.currentSubscription = subscription;
+        this.isLoadingSubscription = false;
+        console.log('Suscripción cargada:', subscription);
+      },
+      error: (error) => {
+        console.error('Error cargando suscripción:', error);
+        this.isLoadingSubscription = false;
+        // No mostrar error toast aquí, ya que es normal no tener suscripción
+      }
+    });
+  }
+
+  /**
+   * Calcula los días restantes hasta la próxima facturación.
+   */
+  getDaysUntilNextBilling(): number {
+    if (!this.currentSubscription?.nextBillingDate) return 0;
+    
+    const nextBilling = new Date(this.currentSubscription.nextBillingDate);
+    const today = new Date();
+    const diffTime = nextBilling.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    return Math.max(0, diffDays);
+  }
+
+  /**
+   * Obtiene el porcentaje de uso de un recurso.
+   */
+  getResourceUsagePercentage(used: number, total: number): number {
+    if (total === 0) return 0;
+    return Math.round((used / total) * 100);
+  }
+
+  /**
+   * Obtiene la clase CSS para el progreso de uso de recursos.
+   */
+  getProgressClass(percentage: number): string {
+    if (percentage >= 90) return 'bg-danger';
+    if (percentage >= 75) return 'bg-warning';
+    if (percentage >= 50) return 'bg-info';
+    return 'bg-success';
   }
 
   /**

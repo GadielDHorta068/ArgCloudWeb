@@ -19,6 +19,153 @@
     </div>
   </div>
 
+  <!-- Current Subscription Section -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <!-- Loading State -->
+      <div *ngIf="isLoadingSubscription" class="card">
+        <div class="card-body text-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando suscripción...</span>
+          </div>
+          <p class="mt-2 text-muted">Cargando información de tu plan...</p>
+        </div>
+      </div>
+
+      <!-- Active Subscription -->
+      <div *ngIf="!isLoadingSubscription && currentSubscription" class="card border-success">
+        <div class="card-header bg-success text-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-star me-2"></i>
+              Tu Plan Activo: {{ currentSubscription.plan?.name }}
+            </h5>
+            <span class="badge bg-light text-success">
+              {{ currentSubscription.subscriptionType === 'monthly' ? 'Mensual' : 'Anual' }}
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Plan Details -->
+            <div class="col-md-4">
+              <h6 class="text-muted mb-2">Detalles del Plan</h6>
+              <p class="mb-1"><strong>Estado:</strong> 
+                <span class="badge bg-success">{{ currentSubscription.status | titlecase }}</span>
+              </p>
+              <p class="mb-1"><strong>Inicio:</strong> {{ currentSubscription.startDate | date:'dd/MM/yyyy' }}</p>
+              <p class="mb-1"><strong>Próxima facturación:</strong> {{ currentSubscription.nextBillingDate | date:'dd/MM/yyyy' }}</p>
+              <p class="mb-0"><strong>Días restantes:</strong> {{ getDaysUntilNextBilling() }} días</p>
+            </div>
+            
+            <!-- Resource Usage -->
+            <div class="col-md-8">
+              <h6 class="text-muted mb-3">Uso de Recursos</h6>
+              <div class="row">
+                <!-- CPU Usage -->
+                <div class="col-sm-6 mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small class="text-muted">CPU</small>
+                    <small class="text-muted">{{ currentSubscription.usedCpu || 0 }} / {{ currentSubscription.plan?.totalCpu || 0 }} vCPU</small>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar" 
+                         [class]="getProgressClass(getResourceUsagePercentage(currentSubscription.usedCpu || 0, currentSubscription.plan?.totalCpu || 1))"
+                         [style.width.%]="getResourceUsagePercentage(currentSubscription.usedCpu || 0, currentSubscription.plan?.totalCpu || 1)">
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Memory Usage -->
+                <div class="col-sm-6 mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small class="text-muted">Memoria</small>
+                    <small class="text-muted">{{ (currentSubscription.usedMemory || 0) / 1024 | number:'1.1-1' }} / {{ (currentSubscription.plan?.totalMemory || 0) / 1024 | number:'1.1-1' }} GB</small>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar" 
+                         [class]="getProgressClass(getResourceUsagePercentage(currentSubscription.usedMemory || 0, currentSubscription.plan?.totalMemory || 1))"
+                         [style.width.%]="getResourceUsagePercentage(currentSubscription.usedMemory || 0, currentSubscription.plan?.totalMemory || 1)">
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Disk Usage -->
+                <div class="col-sm-6 mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small class="text-muted">Almacenamiento</small>
+                    <small class="text-muted">{{ currentSubscription.usedDisk || 0 }} / {{ currentSubscription.plan?.totalDisk || 0 }} GB</small>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar" 
+                         [class]="getProgressClass(getResourceUsagePercentage(currentSubscription.usedDisk || 0, currentSubscription.plan?.totalDisk || 1))"
+                         [style.width.%]="getResourceUsagePercentage(currentSubscription.usedDisk || 0, currentSubscription.plan?.totalDisk || 1)">
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- VMs Usage -->
+                <div class="col-sm-6 mb-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small class="text-muted">Máquinas Virtuales</small>
+                    <small class="text-muted">{{ currentSubscription.currentVMs || 0 }} / {{ currentSubscription.plan?.maxVMs || 0 }} VMs</small>
+                  </div>
+                  <div class="progress" style="height: 8px;">
+                    <div class="progress-bar" 
+                         [class]="getProgressClass(getResourceUsagePercentage(currentSubscription.currentVMs || 0, currentSubscription.plan?.maxVMs || 1))"
+                         [style.width.%]="getResourceUsagePercentage(currentSubscription.currentVMs || 0, currentSubscription.plan?.maxVMs || 1)">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Action Buttons -->
+          <div class="row mt-3">
+            <div class="col-12">
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-primary" routerLink="/pricing">
+                  <i class="fas fa-arrow-up me-2"></i>
+                  Actualizar Plan
+                </button>
+                <button type="button" class="btn btn-outline-secondary" routerLink="/account">
+                  <i class="fas fa-cog me-2"></i>
+                  Gestionar Suscripción
+                </button>
+                <button type="button" class="btn btn-outline-info" (click)="loadCurrentSubscription()">
+                  <i class="fas fa-sync-alt me-2"></i>
+                  Actualizar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Subscription State -->
+      <div *ngIf="!isLoadingSubscription && !currentSubscription" class="card border-warning">
+        <div class="card-header bg-warning text-dark">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Sin Plan Activo
+          </h5>
+        </div>
+        <div class="card-body text-center">
+          <i class="fas fa-shopping-cart text-warning mb-3" style="font-size: 3rem;"></i>
+          <h4>¡Activa tu plan para comenzar!</h4>
+          <p class="text-muted mb-4">
+            Necesitas una suscripción activa para crear y gestionar máquinas virtuales.
+          </p>
+          <button type="button" class="btn btn-warning btn-lg" routerLink="/pricing">
+            <i class="fas fa-star me-2"></i>
+            Ver Planes Disponibles
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Stats Cards -->
   <div class="row mb-4">
     <div class="col-lg-3 col-md-6 mb-3">
@@ -26,12 +173,17 @@
         <div class="card-body">
           <div class="d-flex justify-content-between">
             <div>
-              <h4>0</h4>
+              <h4>{{ currentSubscription?.currentVMs || 0 }}</h4>
               <p class="mb-0">VMs Activas</p>
             </div>
             <div class="align-self-center">
               <i class="fas fa-server fa-2x"></i>
             </div>
+          </div>
+          <div class="mt-2" *ngIf="currentSubscription">
+            <small class="opacity-75">
+              Límite: {{ currentSubscription.plan?.maxVMs || 0 }} VMs
+            </small>
           </div>
         </div>
       </div>
@@ -42,12 +194,17 @@
         <div class="card-body">
           <div class="d-flex justify-content-between">
             <div>
-              <h4>0</h4>
+              <h4>{{ currentSubscription?.usedCpu || 0 }}</h4>
               <p class="mb-0">CPU Cores</p>
             </div>
             <div class="align-self-center">
               <i class="fas fa-microchip fa-2x"></i>
             </div>
+          </div>
+          <div class="mt-2" *ngIf="currentSubscription">
+            <small class="opacity-75">
+              Disponible: {{ currentSubscription.plan?.totalCpu || 0 }} vCPU
+            </small>
           </div>
         </div>
       </div>
@@ -58,12 +215,17 @@
         <div class="card-body">
           <div class="d-flex justify-content-between">
             <div>
-              <h4>0 GB</h4>
+              <h4>{{ (currentSubscription?.usedMemory || 0) / 1024 | number:'1.1-1' }} GB</h4>
               <p class="mb-0">Memoria RAM</p>
             </div>
             <div class="align-self-center">
               <i class="fas fa-memory fa-2x"></i>
             </div>
+          </div>
+          <div class="mt-2" *ngIf="currentSubscription">
+            <small class="opacity-75">
+              Total: {{ (currentSubscription.plan?.totalMemory || 0) / 1024 | number:'1.1-1' }} GB
+            </small>
           </div>
         </div>
       </div>
@@ -74,12 +236,17 @@
         <div class="card-body">
           <div class="d-flex justify-content-between">
             <div>
-              <h4>0 GB</h4>
+              <h4>{{ currentSubscription?.usedDisk || 0 }} GB</h4>
               <p class="mb-0">Almacenamiento</p>
             </div>
             <div class="align-self-center">
               <i class="fas fa-hdd fa-2x"></i>
             </div>
+          </div>
+          <div class="mt-2" *ngIf="currentSubscription">
+            <small class="opacity-75">
+              Total: {{ currentSubscription.plan?.totalDisk || 0 }} GB SSD
+            </small>
           </div>
         </div>
       </div>
