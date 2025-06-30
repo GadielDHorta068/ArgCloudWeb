@@ -10,9 +10,12 @@
               La plataforma líder en Argentina para gestionar máquinas virtuales en la nube. 
               Escalable, segura y fácil de usar.
             </p>
-            <div class="d-flex gap-3">
+            <div class="d-flex gap-3 flex-wrap">
               <button class="btn btn-light btn-lg btn-custom" (click)="scrollToFeatures()">
                 Conocer Más
+              </button>
+              <button class="btn btn-outline-light btn-lg btn-custom" (click)="scrollToProjects()">
+                <i class="fab fa-github me-2"></i>Ver Proyectos
               </button>
               <button class="btn btn-outline-light btn-lg btn-custom" (click)="navigateToRegister()">
                 Comenzar Gratis
@@ -71,6 +74,76 @@
                 <p class="card-text">
                   Panel de control intuitivo para administrar todas tus máquinas virtuales.
                 </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="py-5 bg-light" id="projects">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 text-center mb-5">
+            <h2 class="fw-bold">Nuestros Proyectos</h2>
+            <p class="text-muted">Explora nuestros proyectos</p>
+            <button class="btn btn-outline-primary btn-sm" (click)="scrollToProjects()">
+              <i class="fab fa-github me-2"></i>Ver en GitHub
+            </button>
+          </div>
+        </div>
+        
+        <div class="row g-4">
+          <div class="col-lg-4 col-md-6" *ngFor="let project of projects">
+            <div class="card project-card h-100" 
+                 (click)="openGithubRepo(project, $event)"
+                 [attr.data-color]="project.color">
+              <div class="card-body d-flex flex-column">
+                <div class="project-header mb-3">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <i [class]="project.icon + ' fa-2x text-' + project.color"></i>
+                    <span class="badge" 
+                          [class]="'bg-' + project.color + ' project-status'">
+                      {{ project.status | titlecase }}
+                    </span>
+                  </div>
+                  <h5 class="card-title project-title">{{ project.name }}</h5>
+                </div>
+                
+                <p class="card-text project-description flex-grow-1">
+                  {{ project.description }}
+                </p>
+                
+                <div class="project-footer mt-auto">
+                  <div class="technologies mb-3">
+                    <span class="badge bg-secondary me-1 mb-1" 
+                          *ngFor="let tech of project.technologies">
+                      {{ tech }}
+                    </span>
+                  </div>
+                  
+                  <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                      <i class="fas fa-clock me-1"></i>
+                      {{ project.lastUpdated | date:'shortDate' }}
+                    </small>
+                    <div class="project-link">
+                      <i class="fab fa-github me-1"></i>
+                      <span>Ver código</span>
+                      <i class="fas fa-external-link-alt ms-1 fa-sm"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Overlay para el hover effect -->
+              <div class="project-overlay">
+                <div class="overlay-content">
+                  <i class="fab fa-github fa-3x mb-3"></i>
+                  <h6>Ver en GitHub</h6>
+                  <p class="mb-0">Explora el código fuente</p>
+                </div>
               </div>
             </div>
           </div>

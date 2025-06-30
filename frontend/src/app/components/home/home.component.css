@@ -5,4 +5,262 @@
 }
 .fa-10x {
   font-size: 8rem;
-} 
+}
+
+/* === ESTILOS PARA TARJETAS DE PROYECTOS === */
+
+.project-card {
+  position: relative;
+  cursor: pointer;
+  border: none;
+  border-radius: 15px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1);
+  background: rgba(27, 39, 53, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 255, 255, 0.1);
+}
+
+.project-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #007bff, #28a745, #17a2b8, #ffc107, #dc3545, #6c757d);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  z-index: 1;
+}
+
+.project-card[data-color="primary"]::before {
+  background: linear-gradient(90deg, #00ffff, #007bff);
+}
+
+.project-card[data-color="success"]::before {
+  background: linear-gradient(90deg, #00ff88, #28a745);
+}
+
+.project-card[data-color="info"]::before {
+  background: linear-gradient(90deg, #00ffff, #17a2b8);
+}
+
+.project-card[data-color="warning"]::before {
+  background: linear-gradient(90deg, #ffff00, #ffc107);
+}
+
+.project-card[data-color="danger"]::before {
+  background: linear-gradient(90deg, #ff6b6b, #dc3545);
+}
+
+.project-card[data-color="secondary"]::before {
+  background: linear-gradient(90deg, #ffffff, #6c757d);
+}
+
+.project-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 255, 255, 0.2);
+  border-color: rgba(0, 255, 255, 0.3);
+}
+
+.project-card:hover::before {
+  transform: scaleX(1);
+}
+
+.project-card .card-body {
+  position: relative;
+  z-index: 2;
+  padding: 1.5rem;
+}
+
+.project-header {
+  position: relative;
+}
+
+.project-title {
+  font-weight: 700;
+  font-size: 1.25rem;
+  margin-bottom: 0;
+  transition: color 0.3s ease;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.project-card:hover .project-title {
+  color: #00ffff;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+.project-description {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  transition: color 0.3s ease;
+}
+
+.project-card:hover .project-description {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.project-status {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.technologies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.technologies .badge {
+  font-size: 0.7rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  background-color: rgba(0, 255, 255, 0.1) !important;
+  color: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(0, 255, 255, 0.2);
+}
+
+.project-card:hover .technologies .badge {
+  transform: scale(1.05);
+  background-color: rgba(0, 255, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(0, 255, 255, 0.4);
+}
+
+.project-link {
+  color: #00ffff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.project-card:hover .project-link {
+  color: #ffffff;
+  transform: translateX(5px);
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+}
+
+/* Texto de fecha */
+.project-card .text-muted {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+.project-card:hover .text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Overlay para efecto hover */
+.project-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.9) 0%, rgba(0, 123, 255, 0.9) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 10;
+}
+
+.project-card:hover .project-overlay {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.overlay-content {
+  text-align: center;
+  color: white;
+  transform: translateY(20px);
+  transition: transform 0.4s ease 0.1s;
+}
+
+.project-card:hover .overlay-content {
+  transform: translateY(0);
+}
+
+.overlay-content h6 {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.overlay-content p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Animaciones específicas por color */
+.project-card[data-color="primary"]:hover .project-overlay {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.9) 0%, rgba(0, 123, 255, 0.9) 100%);
+}
+
+.project-card[data-color="success"]:hover .project-overlay {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.9) 0%, rgba(40, 167, 69, 0.9) 100%);
+}
+
+.project-card[data-color="info"]:hover .project-overlay {
+  background: linear-gradient(135deg, rgba(0, 255, 255, 0.9) 0%, rgba(23, 162, 184, 0.9) 100%);
+}
+
+.project-card[data-color="warning"]:hover .project-overlay {
+  background: linear-gradient(135deg, rgba(255, 255, 0, 0.9) 0%, rgba(255, 193, 7, 0.9) 100%);
+}
+
+.project-card[data-color="danger"]:hover .project-overlay {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.9) 0%, rgba(220, 53, 69, 0.9) 100%);
+}
+
+.project-card[data-color="secondary"]:hover .project-overlay {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(108, 117, 125, 0.9) 100%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .project-card {
+    margin-bottom: 1rem;
+  }
+  
+  .project-card:hover {
+    transform: translateY(-5px) scale(1.01);
+  }
+  
+  .technologies {
+    justify-content: center;
+  }
+}
+
+/* Animación de entrada para las tarjetas */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.project-card {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+.project-card:nth-child(1) { animation-delay: 0.1s; }
+.project-card:nth-child(2) { animation-delay: 0.2s; }
+.project-card:nth-child(3) { animation-delay: 0.3s; }
+.project-card:nth-child(4) { animation-delay: 0.4s; }
+.project-card:nth-child(5) { animation-delay: 0.5s; }
+.project-card:nth-child(6) { animation-delay: 0.6s; } 

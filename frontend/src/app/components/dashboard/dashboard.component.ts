@@ -94,47 +94,36 @@ export class DashboardComponent implements OnInit {
   /**
    * Selecciona una máquina virtual para ver sus detalles.
    * @param machine La máquina virtual seleccionada.
+   * @param event El evento del click (opcional).
    */
-  selectMachine(machine: VirtualMachine): void {
+  selectMachine(machine: VirtualMachine, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+    }
     this.selectedMachine = machine;
   }
 
-  /** Vuelve a la lista de máquinas virtuales. */
-  deselectMachine(): void {
-    this.selectedMachine = null;
-  }
-
-  /**
-   * Crea una nueva máquina virtual (simulado).
-   * En una implementación real, esto abriría un formulario o llamaría a una API.
+  /** 
+   * Vuelve a la lista de máquinas virtuales. 
+   * @param event El evento del click (opcional).
    */
-  createNewVM(): void {
-    // Lógica simulada para añadir una nueva VM
-    const newId = this.virtualMachines.length > 0 ? Math.max(...this.virtualMachines.map(vm => vm.id)) + 1 : 1;
-    const newVM: VirtualMachine = {
-      id: newId,
-      name: `Nueva VM ${newId} (Pendiente)`,
-      status: 'stopped',
-      os: 'Desconocido',
-      cpu: 1,
-      memory: 1024,
-      disk: 20,
-      ipAddress: '0.0.0.0',
-      macAddress: '00:00:00:00:00:00',
-      nodeName: 'proxmox-node-1',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      userName: 'admin'
-    };
-    this.virtualMachines.push(newVM);
-    this.selectMachine(newVM);
+  deselectMachine(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+    }
+    this.selectedMachine = null;
   }
 
   /**
    * Inicia una máquina virtual (simulado).
    * @param vm La máquina virtual a iniciar.
+   * @param event El evento del click (opcional).
    */
-  startVM(vm: VirtualMachine): void {
+  startVM(vm: VirtualMachine, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     console.log(`Iniciando ${vm.name}...`);
     vm.status = 'running';
   }
@@ -142,8 +131,13 @@ export class DashboardComponent implements OnInit {
   /**
    * Reinicia una máquina virtual (simulado).
    * @param vm La máquina virtual a reiniciar.
+   * @param event El evento del click (opcional).
    */
-  restartVM(vm: VirtualMachine): void {
+  restartVM(vm: VirtualMachine, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     console.log(`Reiniciando ${vm.name}...`);
     vm.status = 'restarting';
     setTimeout(() => {
@@ -155,8 +149,13 @@ export class DashboardComponent implements OnInit {
   /**
    * Detiene una máquina virtual (simulado).
    * @param vm La máquina virtual a detener.
+   * @param event El evento del click (opcional).
    */
-  stopVM(vm: VirtualMachine): void {
+  stopVM(vm: VirtualMachine, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     console.log(`Deteniendo ${vm.name}...`);
     vm.status = 'stopped';
   }
@@ -164,8 +163,13 @@ export class DashboardComponent implements OnInit {
   /**
    * Abre la consola de la máquina virtual (simulado).
    * @param vm La máquina virtual para la que se abrirá la consola.
+   * @param event El evento del click (opcional).
    */
-  openConsole(vm: VirtualMachine): void {
+  openConsole(vm: VirtualMachine, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     console.log(`Abriendo consola para ${vm.name}...`);
     // En una implementación real, esto podría navegar a una nueva ruta
     // o abrir un modal con un componente de terminal (ej. ngx-terminal).
@@ -175,8 +179,13 @@ export class DashboardComponent implements OnInit {
   /**
    * Abre la conexión FTP para la máquina virtual (simulado).
    * @param vm La máquina virtual para la que se abrirá la conexión FTP.
+   * @param event El evento del click (opcional).
    */
-  openFTP(vm: VirtualMachine): void {
+  openFTP(vm: VirtualMachine, event?: Event): void {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     console.log(`Abriendo FTP para ${vm.name}...`);
     // Esto podría abrir un enlace ftp:// o mostrar detalles de conexión.
     alert(`FTP para ${vm.name} (simulado)`);

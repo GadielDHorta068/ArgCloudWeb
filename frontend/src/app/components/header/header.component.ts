@@ -52,32 +52,50 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   /** Navega a la página de inicio. */
-  navigateHome(): void {
+  navigateHome(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+    }
     this.router.navigate(['/']);
   }
 
   /** Navega a la página de inicio de sesión. */
-  navigateLogin(): void {
+  navigateLogin(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+    }
     this.router.navigate(['/login']);
   }
 
   /** Navega a la página de registro. */
-  navigateRegister(): void {
+  navigateRegister(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+    }
     this.router.navigate(['/register']);
   }
 
   /** Navega al dashboard del usuario. */
-  navigateDashboard(): void {
+  navigateDashboard(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+    }
     this.router.navigate(['/dashboard']);
   }
 
   /** Navega a la página de máquinas virtuales. */
-  navigateVirtualMachines(): void {
+  navigateVirtualMachines(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+    }
     this.router.navigate(['/virtual-machines']);
   }
 
   /** Cierra la sesión del usuario y lo redirige a la página de inicio. */
-  logout(): void {
+  logout(event?: Event): void {
+    if (event) {
+      event.preventDefault();
+    }
     this.authService.logout();
     this.router.navigate(['/']);
   }
