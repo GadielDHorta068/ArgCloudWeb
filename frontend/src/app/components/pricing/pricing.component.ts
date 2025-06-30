@@ -209,29 +209,27 @@ export class PricingComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Maneja la selección de un plan.
+   * Selecciona un plan y navega al checkout.
    */
   selectPlan(plan: HardwarePlan): void {
-    if (!this.isLoggedIn) {
+    // Verificar si el usuario está autenticado
+    if (!this.authService.isLoggedIn()) {
+      this.toastr.info('Debe iniciar sesión para contratar un plan', 'Iniciar Sesión');
       this.router.navigate(['/login'], { 
-        queryParams: { returnUrl: '/pricing', selectedPlan: plan.id } 
+        queryParams: { 
+          returnUrl: `/checkout?planId=${plan.id}&subscriptionType=${this.selectedBillingCycle}` 
+        } 
       });
       return;
     }
 
-    if (this.isButtonDisabled(plan)) {
+    // Verificar si ya tiene una suscripción activa
+    if (this.currentSubscription && this.currentSubscription.status === 'active') {
+      this.toastr.warning('Ya tienes una suscripción activa', 'Suscripción Existente');
       return;
     }
 
-    this.initiatePurchase(plan);
-  }
-
-  /**
-   * Inicia el proceso de compra de un plan.
-   * Redirige al usuario al checkout integrado con Mercado Pago CardForm.
-   */
-  private initiatePurchase(plan: HardwarePlan): void {
-    // Redirigir al checkout con los datos del plan seleccionado
+    // Navegar al checkout con los parámetros del plan
     this.router.navigate(['/checkout'], {
       queryParams: {
         planId: plan.id,

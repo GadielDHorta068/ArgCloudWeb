@@ -56,7 +56,19 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     private authService: AuthService
   ) {}
 
+  /**
+   * Inicializa el componente y carga el plan seleccionado.
+   */
   ngOnInit(): void {
+    // Verificar autenticación antes de proceder
+    if (!this.authService.isLoggedIn()) {
+      this.toastr.error('Debe iniciar sesión para realizar un pago', 'Acceso Denegado');
+      this.router.navigate(['/login'], { 
+        queryParams: { returnUrl: this.router.url } 
+      });
+      return;
+    }
+
     this.loadPlanFromParams();
   }
 
@@ -211,6 +223,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
               console.error('Error montando CardForm:', error);
               console.error('Detalles del error:', JSON.stringify(error, null, 2));
               this.toastr.error('Error cargando formulario de pago');
+            } else {
+              console.log('✅ CardForm montado correctamente');
             }
           },
           onFormUnmounted: (error: any) => {
@@ -221,24 +235,26 @@ export class CheckoutComponent implements OnInit, OnDestroy {
           onIdentificationTypesReceived: (error: any, identificationTypes: any) => {
             if (error) {
               console.error('Error recibiendo tipos de identificación:', error);
+            } else {
+              console.log('✅ Tipos de identificación recibidos:', identificationTypes);
             }
           },
           onInstallmentsReceived: (error: any, installments: any) => {
             if (error) {
               console.error('Error recibiendo cuotas:', error);
-            }
-          },
-          onCardTokenReceived: (error: any, token: any) => {
-            if (error) {
-              console.error('Error al crear token de tarjeta:', error);
-              this.toastr.error('Error de validación. Revise los datos de su tarjeta.');
-              this.isProcessingPayment = false;
             } else {
-              this.processPaymentWithToken(token);
+              console.log('✅ Cuotas disponibles:', installments);
             }
           },
-          onSubmit: (event: { preventDefault: () => void; }) => {
-            // Este callback se activa al hacer submit, pero usamos nuestro propio botón
+          onSubmit: (event: any) => {
+            event.preventDefault();
+            console.log('🚀 CardForm onSubmit activado');
+            
+            // Obtener datos del CardForm según la documentación oficial
+            const cardFormData = this.cardForm.getCardFormData();
+            console.log('💳 Datos completos del CardForm:', cardFormData);
+            
+            this.processPaymentWithToken(cardFormData);
           },
           onError: (error: any) => {
             console.error('Error general en CardForm:', error);
@@ -281,7 +297,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Validar datos del formulario
+    // Validar datos del formulario antes de enviar
     if (!this.validateForm()) {
       return;
     }
@@ -289,14 +305,11 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.isProcessingPayment = true;
     this.toastr.info('Procesando pago...');
 
-    try {
-      // Crear el token de la tarjeta
-      this.cardForm.createCardToken();
-    } catch (error) {
-      console.error('Error al llamar a createCardToken:', error);
-      this.toastr.error('No se pudo iniciar el proceso de pago. Intente nuevamente.');
-      this.isProcessingPayment = false;
-    }
+    console.log('📝 Iniciando proceso de pago...');
+    console.log('🔍 Validación completada, enviando formulario al CardForm...');
+    
+    // El CardForm se encargará de procesar el formulario y llamar al callback onSubmit
+    // No necesitamos hacer nada más aquí, el callback onSubmit manejará el resto
   }
 
   /**
@@ -366,32 +379,98 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Verificar autenticación antes de procesar el pago
+    if (!this.authService.isLoggedIn()) {
+      this.toastr.error('Su sesión ha expirado. Por favor, inicie sesión nuevamente.', 'Sesión Expirada');
+      this.isProcessingPayment = false;
+      this.router.navigate(['/login'], { 
+        queryParams: { returnUrl: this.router.url } 
+      });
+      return;
+    }
+
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser) {
+      this.toastr.error('No se pudo obtener la información del usuario');
+      this.isProcessingPayment = false;
+      return;
+    }
+
+    console.log('🔐 Usuario autenticado:', currentUser.email);
+    console.log('🎫 Token presente:', !!this.authService.getToken());
+    console.log('💳 Datos de CardForm recibidos:', cardFormData);
+
+    // Verificar que tenemos todos los datos necesarios del CardForm
+    if (!cardFormData.token) {
+      this.toastr.error('No se pudo obtener el token de la tarjeta');
+      this.isProcessingPayment = false;
+      return;
+    }
+
+    if (!cardFormData.paymentMethodId) {
+      this.toastr.error('No se pudo identificar el método de pago');
+      this.isProcessingPayment = false;
+      return;
+    }
+
+    if (!cardFormData.installments || cardFormData.installments < 1) {
+      this.toastr.error('No se pudo obtener información de cuotas');
+      this.isProcessingPayment = false;
+      return;
+    }
+
+    // Construir el objeto PaymentRequest
     const paymentRequest: PaymentRequest = {
       planId: this.selectedPlan.id,
       subscriptionType: this.subscriptionType,
       email: this.formData.email,
     };
 
-    const fullPaymentData = {
-      ...paymentRequest,
+    // Construir el objeto CreatePaymentData según el formato esperado por el backend
+    const createPaymentData = {
+      paymentRequest: paymentRequest,
       token: cardFormData.token,
-      paymentMethodId: cardFormData.payment_method_id,
-      issuerId: cardFormData.issuer_id,
-      installments: cardFormData.installments,
+      paymentMethodId: cardFormData.paymentMethodId,
+      issuerId: cardFormData.issuerId || null,
+      installments: parseInt(cardFormData.installments),
       identificationType: this.formData.identificationType,
-      identificationNumber: this.formData.identificationNumber,
+      identificationNumber: this.formData.identificationNumber
     };
 
-    this.hardwarePlanService.createPayment(fullPaymentData).subscribe({
+    console.log('💳 Enviando datos de pago:', {
+      planId: paymentRequest.planId,
+      subscriptionType: paymentRequest.subscriptionType,
+      email: paymentRequest.email,
+      hasToken: !!createPaymentData.token,
+      paymentMethodId: createPaymentData.paymentMethodId,
+      issuerId: createPaymentData.issuerId,
+      installments: createPaymentData.installments,
+      installmentsType: typeof createPaymentData.installments
+    });
+
+    this.hardwarePlanService.createPayment(createPaymentData).subscribe({
       next: (response) => {
         this.isProcessingPayment = false;
         this.toastr.success('¡Pago realizado con éxito! Redirigiendo...', 'Éxito');
+        console.log('✅ Respuesta del pago:', response);
         this.router.navigate(['/dashboard']);
       },
       error: (error) => {
         this.isProcessingPayment = false;
-        console.error('Error procesando pago:', error);
-        this.toastr.error('Ocurrió un error al procesar el pago. Por favor, intente nuevamente.');
+        console.error('❌ Error procesando pago:', error);
+        console.error('❌ Detalles del error:', JSON.stringify(error, null, 2));
+        
+        if (error.status === 401 || error.status === 403) {
+          this.toastr.error('Su sesión ha expirado o no tiene permisos. Iniciando sesión nuevamente...', 'Error de Autenticación');
+          this.authService.logout();
+          this.router.navigate(['/login'], { 
+            queryParams: { returnUrl: this.router.url } 
+          });
+        } else {
+          // Mostrar mensaje de error más específico si está disponible
+          const errorMessage = error.error?.message || error.message || 'Ocurrió un error al procesar el pago. Por favor, intente nuevamente.';
+          this.toastr.error(errorMessage, 'Error de Pago');
+        }
       }
     });
   }
