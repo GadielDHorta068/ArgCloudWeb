@@ -19,6 +19,8 @@ export class RegisterComponent implements OnInit {
   errorMessage = '';
   /** Mensaje de éxito a mostrar tras un registro exitoso. */
   successMessage = '';
+  /** Controla la visibilidad del modal de términos y condiciones. */
+  showTermsModal = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -35,7 +37,8 @@ export class RegisterComponent implements OnInit {
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]]
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      acceptTerms: [false, [Validators.requiredTrue]] // Campo requerido para aceptar términos
     });
   }
 
@@ -47,6 +50,8 @@ export class RegisterComponent implements OnInit {
   get email() { return this.registerForm.get('email'); }
   /** Getter para acceder fácilmente al control del campo de contraseña. */
   get password() { return this.registerForm.get('password'); }
+  /** Getter para acceder fácilmente al control del campo de aceptación de términos. */
+  get acceptTerms() { return this.registerForm.get('acceptTerms'); }
 
   /**
    * Se ejecuta al enviar el formulario.
@@ -70,5 +75,29 @@ export class RegisterComponent implements OnInit {
         }
       });
     }
+  }
+
+  /**
+   * Abre el modal de términos y condiciones para que el usuario pueda revisarlos.
+   */
+  openTermsAndConditions(): void {
+    this.showTermsModal = true;
+  }
+
+  /**
+   * Se ejecuta cuando el usuario cierra el modal sin aceptar los términos.
+   */
+  onTermsModalClose(): void {
+    this.showTermsModal = false;
+  }
+
+  /**
+   * Se ejecuta cuando el usuario acepta los términos desde el modal.
+   * Marca automáticamente el checkbox de aceptación de términos.
+   */
+  onTermsAccepted(): void {
+    this.showTermsModal = false;
+    // Marcar automáticamente el checkbox de términos como aceptado
+    this.registerForm.patchValue({ acceptTerms: true });
   }
 } 

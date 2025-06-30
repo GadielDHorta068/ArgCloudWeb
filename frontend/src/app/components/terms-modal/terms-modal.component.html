@@ -1,0 +1,69 @@
+<!-- Modal de Términos y Condiciones -->
+<div class="modal fade show" 
+     [class.d-block]="isVisible" 
+     [class.d-none]="!isVisible"
+     tabindex="-1" 
+     role="dialog" 
+     aria-labelledby="termsModalLabel" 
+     aria-hidden="true"
+     (click)="onBackdropClick($event)">
+  
+  <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      
+      <!-- Encabezado del Modal -->
+      <div class="modal-header border-bottom">
+        <h4 class="modal-title" id="termsModalLabel">
+          <i class="fas fa-file-contract me-2 text-primary"></i>
+          Términos y Condiciones
+        </h4>
+        <button type="button" 
+                class="btn-close" 
+                aria-label="Cerrar"
+                (click)="onClose()">
+        </button>
+      </div>
+      
+      <!-- Cuerpo del Modal -->
+      <div class="modal-body">
+        <div class="terms-container">
+          <!-- Contenido de los términos inyectado dinámicamente -->
+          <div [innerHTML]="termsContent" class="terms-content"></div>
+        </div>
+      </div>
+      
+      <!-- Pie del Modal -->
+      <div class="modal-footer border-top">
+        <div class="d-flex justify-content-between w-100">
+          <div class="text-muted">
+            <small>
+              <i class="fas fa-info-circle me-1"></i>
+              Lea cuidadosamente antes de aceptar
+            </small>
+          </div>
+          <div>
+            <button type="button" 
+                    class="btn btn-outline-secondary me-2" 
+                    (click)="onClose()">
+              <i class="fas fa-times me-1"></i>
+              Cerrar
+            </button>
+            <button type="button" 
+                    class="btn btn-primary" 
+                    (click)="onAccept()">
+              <i class="fas fa-check me-1"></i>
+              Acepto los Términos
+            </button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<!-- Backdrop del Modal -->
+<div class="modal-backdrop fade show" 
+     [class.d-block]="isVisible" 
+     [class.d-none]="!isVisible">
+</div> 

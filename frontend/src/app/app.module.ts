@@ -14,8 +14,10 @@ import { RegisterComponent } from './components/register/register.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { HeaderComponent } from './components/header/header.component';
 import { VirtualMachinesComponent } from './components/virtual-machines/virtual-machines.component';
+import { TermsModalComponent } from './components/terms-modal/terms-modal.component';
 
 import { AuthService } from './services/auth.service';
+import { TermsConditionsService } from './services/terms-conditions.service';
 import { AuthGuard } from './guards/auth.guard';
 import { GuestGuard } from './guards/guest.guard';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
@@ -38,7 +40,8 @@ const routes = [
     RegisterComponent,
     DashboardComponent,
     HeaderComponent,
-    VirtualMachinesComponent
+    VirtualMachinesComponent,
+    TermsModalComponent
   ],
   imports: [
     BrowserModule,
@@ -55,6 +58,7 @@ const routes = [
   ],
   providers: [
     AuthService,
+    TermsConditionsService,
     AuthGuard,
     GuestGuard,
     {
