@@ -1,0 +1,100 @@
+<!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <h1 class="display-4 fw-bold mb-4">
+              Bienvenido a ArgCloud
+            </h1>
+            <p class="lead mb-4">
+              La plataforma líder en Argentina para gestionar máquinas virtuales en la nube. 
+              Escalable, segura y fácil de usar.
+            </p>
+            <div class="d-flex gap-3">
+              <button class="btn btn-light btn-lg btn-custom" (click)="scrollToFeatures()">
+                Conocer Más
+              </button>
+              <button class="btn btn-outline-light btn-lg btn-custom" (click)="navigateToRegister()">
+                Comenzar Gratis
+              </button>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="text-center">
+              <i class="fas fa-server fa-10x opacity-75"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-5" id="features">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12 text-center mb-5">
+            <h2 class="fw-bold">¿Por qué elegir ArgCloud?</h2>
+            <p class="text-muted">Descubre las ventajas de nuestra plataforma</p>
+          </div>
+        </div>
+        
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="card feature-card h-100 text-center p-4">
+              <div class="card-body">
+                <i class="fas fa-rocket fa-3x text-primary mb-3"></i>
+                <h5 class="card-title">Alto Rendimiento</h5>
+                <p class="card-text">
+                  Máquinas virtuales optimizadas con la última tecnología para máximo rendimiento.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-4">
+            <div class="card feature-card h-100 text-center p-4">
+              <div class="card-body">
+                <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
+                <h5 class="card-title">Seguridad Total</h5>
+                <p class="card-text">
+                  Protección avanzada con encriptación de datos y monitoreo 24/7.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-lg-4">
+            <div class="card feature-card h-100 text-center p-4">
+              <div class="card-body">
+                <i class="fas fa-cogs fa-3x text-info mb-3"></i>
+                <h5 class="card-title">Fácil Gestión</h5>
+                <p class="card-text">
+                  Panel de control intuitivo para administrar todas tus máquinas virtuales.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Email Verification Alert -->
+    <div class="container mt-4" *ngIf="showVerificationMessage">
+      <div class="alert alert-info alert-custom" role="alert">
+        <h4 class="alert-heading">Verificación de Email</h4>
+        <p class="mb-0">{{ verificationMessage }}</p>
+      </div>
+    </div>
+
+    <!-- CTA Section -->
+    <section class="bg-light py-5">
+      <div class="container text-center">
+        <h3 class="fw-bold mb-4">¿Listo para comenzar?</h3>
+        <p class="lead mb-4">
+          Únete a miles de usuarios que ya confían en ArgCloud para sus necesidades de infraestructura.
+        </p>
+        <button class="btn btn-primary btn-lg btn-custom" (click)="navigateToRegister()">
+          Crear Cuenta Gratuita
+        </button>
+      </div>
+    </section> 

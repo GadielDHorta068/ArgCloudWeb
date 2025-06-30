@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: argcloud-postgres
+    environment:
+      POSTGRES_DB: argcloud_db
+      POSTGRES_USER: argcloud_user
+      POSTGRES_PASSWORD: argcloud_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - argcloud-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: argcloud-backend
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - DATABASE_URL=jdbc:postgresql://postgres:5432/argcloud_db
+      - DATABASE_USERNAME=argcloud_user  
+      - DATABASE_PASSWORD=argcloud_password
+      - MAIL_HOST=smtp.gmail.com
+      - MAIL_PORT=587
+      - MAIL_USERNAME=${MAIL_USERNAME:-tu-email@gmail.com}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-tu-contraseña-de-aplicacion}
+      - MAIL_FROM_NAME=ArgCloud Platform
+      - MAIL_FROM_EMAIL=${MAIL_USERNAME:-tu-email@gmail.com}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - argcloud-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: argcloud-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - argcloud-network
+
+volumes:
+  postgres_data:
+
+networks:
+  argcloud-network:
+    driver: bridge
