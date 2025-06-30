@@ -227,14 +227,38 @@ html {
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
 }
 
-/* --- Pie de Página --- */
+/* --- Pie de Página MEJORADO --- */
 .main-footer-bottom {
     text-align: center;
-    padding: 2rem;
-    border-top: 1px solid rgba(0, 255, 255, 0.2);
+    padding: 3rem 2rem;
+    border-top: 2px solid rgba(0, 255, 255, 0.3);
+    background: linear-gradient(135deg, rgba(27, 39, 53, 0.8) 0%, rgba(9, 10, 15, 0.9) 100%);
+    backdrop-filter: blur(15px);
     position: relative;
     z-index: 1;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 4rem;
+    box-shadow: 0 -4px 20px rgba(0, 255, 255, 0.1);
+}
+
+.main-footer-bottom p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+    letter-spacing: 1px;
+}
+
+.main-footer-bottom::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #00ffff, transparent);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
 }
 
 /* --- Página de Login --- */
@@ -348,6 +372,34 @@ html {
     border-color: white;
 }
 
+/* Corrección para botones de Bootstrap con mejor contraste */
+.btn-light {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.9) !important;
+    color: #090a0f !important;
+    font-weight: 600;
+}
+
+.btn-light:hover {
+    background-color: #00ffff !important;
+    border-color: #00ffff !important;
+    color: #090a0f !important;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+}
+
+.btn-outline-light {
+    color: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    background-color: transparent !important;
+}
+
+.btn-outline-light:hover {
+    color: #090a0f !important;
+    background-color: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
 /* Estilos para formularios */
 .form-control {
     background-color: rgba(9, 10, 15, 0.8);
@@ -384,6 +436,18 @@ html {
 
 .card-text {
     color: rgba(255, 255, 255, 0.8);
+}
+
+/* Corrección para card-footer con mejor contraste */
+.card-footer {
+    background-color: rgba(27, 39, 53, 0.6) !important;
+    border-top: 1px solid rgba(0, 255, 255, 0.2) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.card-footer.bg-light {
+    background-color: rgba(27, 39, 53, 0.6) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
 }
 
 /* Estilos para tablas */
@@ -452,4 +516,52 @@ html {
     background-color: rgba(0, 255, 255, 0.1);
     border-color: rgba(0, 255, 255, 0.3);
     color: #00ffff;
+}
+
+/* Corrección para secciones con bg-light */
+.bg-light {
+    background-color: rgba(27, 39, 53, 0.4) !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Corrección para text-muted con mejor contraste */
+.text-muted {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Mejora para elementos con texto oscuro */
+.text-dark {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Corrección para elementos que usan colores de Bootstrap */
+.text-primary {
+    color: #00ffff !important;
+}
+
+.text-secondary {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Mejoras para navegación y dropdowns */
+.nav-link {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.nav-link:hover {
+    color: #00ffff !important;
+}
+
+.dropdown-menu {
+    background-color: rgba(27, 39, 53, 0.95) !important;
+    border: 1px solid rgba(0, 255, 255, 0.2) !important;
+}
+
+.dropdown-item {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(0, 255, 255, 0.1) !important;
+    color: #00ffff !important;
 } 
