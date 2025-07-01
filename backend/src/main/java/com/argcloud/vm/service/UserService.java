@@ -3,6 +3,7 @@ package com.argcloud.vm.service;
 import com.argcloud.vm.dto.AuthResponse;
 import com.argcloud.vm.dto.LoginRequest;
 import com.argcloud.vm.dto.RegisterRequest;
+import com.argcloud.vm.dto.ResetPasswordRequest;
 import com.argcloud.vm.entity.User;
 import com.argcloud.vm.repository.UserRepository;
 import com.argcloud.vm.util.JwtUtils;
@@ -130,6 +131,60 @@ public class UserService {
         userRepository.save(user);
 
         return "Email verificado exitosamente";
+    }
+
+    /**
+     * Inicia el proceso de restablecimiento de contraseña para un usuario.
+     *
+     * @param email el email del usuario que solicita el restablecimiento.
+     * @return un mensaje indicando que se ha enviado un correo si el usuario existe.
+     */
+    public String forgotPassword(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+
+            String token = UUID.randomUUID().toString();
+            user.setPasswordResetToken(token);
+            user.setPasswordResetExpiresAt(LocalDateTime.now().plusHours(1)); // 1 hora de validez
+
+            userRepository.save(user);
+
+            emailService.sendPasswordResetEmail(user.getEmail(), token);
+        }
+
+        // Por seguridad, no revelamos si el email fue encontrado o no.
+        return "Si tu dirección de email está en nuestra base de datos, recibirás un correo con las instrucciones para restablecer tu contraseña.";
+    }
+
+    /**
+     * Restablece la contraseña de un usuario utilizando un token.
+     *
+     * @param request la solicitud con el token y la nueva contraseña.
+     * @return un mensaje indicando el resultado.
+     * @throws RuntimeException si el token es inválido o ha expirado.
+     */
+    public String resetPassword(ResetPasswordRequest request) {
+        Optional<User> userOptional = userRepository.findByPasswordResetToken(request.getToken());
+
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("Token de restablecimiento inválido");
+        }
+
+        User user = userOptional.get();
+
+        if (user.getPasswordResetExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("El token de restablecimiento ha expirado");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setPasswordResetToken(null);
+        user.setPasswordResetExpiresAt(null);
+
+        userRepository.save(user);
+
+        return "Tu contraseña ha sido actualizada exitosamente.";
     }
 
     /**

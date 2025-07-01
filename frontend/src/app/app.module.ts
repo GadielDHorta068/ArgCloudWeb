@@ -12,6 +12,7 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './components/home/home.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { HeaderComponent } from './components/header/header.component';
 import { VirtualMachinesComponent } from './components/virtual-machines/virtual-machines.component';
@@ -19,6 +20,8 @@ import { TermsModalComponent } from './components/terms-modal/terms-modal.compon
 import { PricingComponent } from './components/pricing/pricing.component';
 import { ResourceSummaryComponent } from './components/resource-summary/resource-summary.component';
 import { CheckoutComponent } from './components/checkout/checkout.component';
+import { ResetPasswordComponent } from './components/reset-password/reset-password.component';
+import { AccountComponent } from './components/account/account.component';
 
 import { AuthService } from './services/auth.service';
 import { TermsConditionsService } from './services/terms-conditions.service';
@@ -30,11 +33,14 @@ const routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
+  { path: 'forgot-password', component: ForgotPasswordComponent, canActivate: [GuestGuard] },
+  { path: 'reset-password', component: ResetPasswordComponent, canActivate: [GuestGuard] },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'virtual-machines', component: VirtualMachinesComponent, canActivate: [AuthGuard] },
   { path: 'pricing', component: PricingComponent },
   { path: 'checkout', component: CheckoutComponent, canActivate: [AuthGuard] },
   { path: 'verify-email', component: HomeComponent },
+  { path: 'account', component: AccountComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '' }
 ];
 
@@ -64,7 +70,10 @@ const routes = [
       timeOut: 3000,
       positionClass: 'toast-top-right',
       preventDuplicates: true,
-    })
+    }),
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
+    AccountComponent
   ],
   providers: [
     AuthService,

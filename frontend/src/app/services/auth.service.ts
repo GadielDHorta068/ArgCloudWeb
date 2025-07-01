@@ -6,7 +6,8 @@ import {
   RegisterRequest, 
   AuthResponse, 
   MessageResponse, 
-  User 
+  User,
+  ResetPasswordRequest
 } from '../models/user.model';
 
 const AUTH_API = 'http://localhost:8080/api/auth/';
@@ -46,13 +47,11 @@ export class AuthService {
         const user = JSON.parse(storedUser);
         // Verificar que el token no esté obviamente expirado
         if (this.isTokenExpired(storedToken)) {
-          console.log('Token expirado detectado, limpiando sesión...');
           this.clearAuthData();
         } else {
           this.currentUserSubject.next(user);
         }
       } catch (error) {
-        console.error('Error al parsear usuario almacenado:', error);
         this.clearAuthData();
       }
     }
@@ -70,7 +69,6 @@ export class AuthService {
       const now = Math.floor(Date.now() / 1000);
       return payload.exp < now;
     } catch (error) {
-      console.error('Error al validar token:', error);
       return true; // Si no se puede validar, considerarlo expirado
     }
   }
@@ -114,6 +112,24 @@ export class AuthService {
    */
   register(userData: RegisterRequest): Observable<MessageResponse> {
     return this.http.post<MessageResponse>(AUTH_API + 'register', userData, httpOptions);
+  }
+
+  /**
+   * Envía una solicitud para iniciar el proceso de recuperación de contraseña.
+   * @param credentials Un objeto que contiene el email del usuario.
+   * @returns Un Observable con la respuesta del mensaje.
+   */
+  forgotPassword(credentials: { email: string }): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(AUTH_API + 'forgot-password', credentials, httpOptions);
+  }
+
+  /**
+   * Envía una solicitud para restablecer la contraseña de un usuario.
+   * @param data Los datos para el restablecimiento, incluyendo token y nueva contraseña.
+   * @returns Un Observable con la respuesta del mensaje.
+   */
+  resetPassword(data: ResetPasswordRequest): Observable<MessageResponse> {
+    return this.http.post<MessageResponse>(AUTH_API + 'reset-password', data, httpOptions);
   }
 
   /**
@@ -181,7 +197,6 @@ export class AuthService {
     }
     
     if (this.isTokenExpired(token)) {
-      console.log('Token expirado, limpiando sesión...');
       this.clearAuthData();
       return false;
     }

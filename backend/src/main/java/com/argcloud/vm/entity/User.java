@@ -44,6 +44,12 @@ public class User {
     @Column(name = "email_verification_expires_at")
     private LocalDateTime emailVerificationExpiresAt;
 
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_expires_at")
+    private LocalDateTime passwordResetExpiresAt;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -147,6 +153,22 @@ public class User {
 
     public void setEmailVerificationExpiresAt(LocalDateTime emailVerificationExpiresAt) {
         this.emailVerificationExpiresAt = emailVerificationExpiresAt;
+    }
+
+    public String getPasswordResetToken() {
+        return passwordResetToken;
+    }
+
+    public void setPasswordResetToken(String passwordResetToken) {
+        this.passwordResetToken = passwordResetToken;
+    }
+
+    public LocalDateTime getPasswordResetExpiresAt() {
+        return passwordResetExpiresAt;
+    }
+
+    public void setPasswordResetExpiresAt(LocalDateTime passwordResetExpiresAt) {
+        this.passwordResetExpiresAt = passwordResetExpiresAt;
     }
 
     public LocalDateTime getCreatedAt() {

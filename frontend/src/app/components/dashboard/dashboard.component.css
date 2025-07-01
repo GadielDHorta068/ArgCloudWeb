@@ -1,10 +1,26 @@
 .card {
-  border: none;
+  border: 1px solid rgba(0, 255, 255, 0.1);
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   transition: box-shadow 0.15s ease-in-out;
+  background-color: #1a222c;
+  color: #e5e7eb;
 }
+
+.card .text-muted {
+  color: #9ca3af !important;
+}
+
+.card-header {
+  background-color: #111827;
+  border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+}
+
 .card:hover {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  border-color: rgba(0, 255, 255, 0.2);
+}
+.bg-primary, .bg-success, .bg-info, .bg-warning, .bg-danger {
+  color: #fff !important;
 }
 .bg-primary, .bg-success, .bg-info, .bg-warning {
   background: linear-gradient(45deg, var(--bs-primary), var(--bs-info)) !important;

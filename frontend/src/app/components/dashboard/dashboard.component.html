@@ -129,7 +129,7 @@
                   <i class="fas fa-arrow-up me-2"></i>
                   Actualizar Plan
                 </button>
-                <button type="button" class="btn btn-outline-secondary" routerLink="/account">
+                <button type="button" class="btn btn-outline-secondary" (click)="manageSubscription()">
                   <i class="fas fa-cog me-2"></i>
                   Gestionar Suscripción
                 </button>
@@ -272,7 +272,16 @@
         <div class="card-body">
           <!-- Vista de Lista de VMs -->
           <div *ngIf="!selectedMachine">
-            <div class="list-group">
+            <!-- Spinner de carga -->
+            <div *ngIf="isLoadingVMs" class="text-center">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando máquinas virtuales...</span>
+              </div>
+              <p class="mt-2 text-muted">Cargando tus máquinas virtuales...</p>
+            </div>
+
+            <!-- Lista de VMs -->
+            <div *ngIf="!isLoadingVMs && virtualMachines.length > 0" class="list-group">
               <a *ngFor="let vm of virtualMachines" (click)="selectMachine(vm, $event)"
                 class="list-group-item list-group-item-action d-flex justify-content-between align-items-center" style="cursor: pointer;">
                 <div>
@@ -303,9 +312,11 @@
                   </button>
                 </div>
               </a>
-              <div *ngIf="virtualMachines.length === 0" class="list-group-item text-center">
-                No tienes máquinas virtuales disponibles.
-              </div>
+            </div>
+
+            <!-- Mensaje de no VMs -->
+            <div *ngIf="!isLoadingVMs && virtualMachines.length === 0" class="list-group-item text-center">
+              No tienes máquinas virtuales disponibles.
             </div>
           </div>
 

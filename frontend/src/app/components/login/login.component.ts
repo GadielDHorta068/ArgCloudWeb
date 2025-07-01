@@ -62,4 +62,11 @@ export class LoginComponent implements OnInit {
       });
     }
   }
+
+  /**
+   * Navega a la página de recuperación de contraseña.
+   */
+  navigateToForgotPassword(): void {
+    this.router.navigate(['/forgot-password']);
+  }
 } 

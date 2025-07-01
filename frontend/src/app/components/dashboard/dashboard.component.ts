@@ -6,6 +6,8 @@ import { User } from '../../models/user.model';
 import { VirtualMachine } from '../../models/virtual-machine.model';
 import { UserSubscription } from '../../models/hardware-plan.model';
 import { ToastrService } from 'ngx-toastr';
+import { VirtualMachineService } from '../../services/virtual-machine.service';
+import { Router } from '@angular/router';
 
 /**
  * Componente del panel de control del usuario.
@@ -24,14 +26,18 @@ export class DashboardComponent implements OnInit {
   currentSubscription: UserSubscription | null = null;
   /** Estado de carga de la suscripción */
   isLoadingSubscription = false;
+  /** Estado de carga de las máquinas virtuales */
+  isLoadingVMs = false;
   virtualMachines: VirtualMachine[] = [];
   selectedMachine: VirtualMachine | null = null;
 
   constructor(
     private authService: AuthService,
     private hardwarePlanService: HardwarePlanService,
+    private vmService: VirtualMachineService,
     private toastr: ToastrService,
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) { }
 
   /**
@@ -99,57 +105,21 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Carga una lista de máquinas virtuales de prueba.
-   * En una implementación real, esto vendría de una API.
+   * Carga la lista de máquinas virtuales del usuario desde el backend.
    */
   loadVirtualMachines(): void {
-    this.virtualMachines = [
-      { 
-        id: 1, 
-        name: 'Servidor Web (Ubuntu)', 
-        status: 'running', 
-        os: 'Ubuntu 22.04', 
-        cpu: 2, 
-        memory: 2048, 
-        disk: 50,
-        ipAddress: '192.168.1.100',
-        macAddress: '00:16:3e:12:34:56',
-        nodeName: 'proxmox-node-1',
-        createdAt: '2024-01-15T10:30:00Z',
-        updatedAt: '2024-01-20T14:45:00Z',
-        userName: 'admin'
+    this.isLoadingVMs = true;
+    this.vmService.getUserVirtualMachines().subscribe({
+      next: (vms) => {
+        this.virtualMachines = vms;
+        this.isLoadingVMs = false;
       },
-      { 
-        id: 2, 
-        name: 'Base de Datos (Debian)', 
-        status: 'stopped', 
-        os: 'Debian 11', 
-        cpu: 4, 
-        memory: 4096, 
-        disk: 100,
-        ipAddress: '192.168.1.101',
-        macAddress: '00:16:3e:12:34:57',
-        nodeName: 'proxmox-node-2',
-        createdAt: '2024-01-10T08:15:00Z',
-        updatedAt: '2024-01-18T16:20:00Z',
-        userName: 'admin'
-      },
-      { 
-        id: 3, 
-        name: 'Entorno de tuvieja (Fedora)', 
-        status: 'running', 
-        os: 'Fedora 38', 
-        cpu: 8, 
-        memory: 16384, 
-        disk: 250,
-        ipAddress: '192.168.1.102',
-        macAddress: '00:16:3e:12:34:58',
-        nodeName: 'proxmox-node-1',
-        createdAt: '2024-01-12T12:00:00Z',
-        updatedAt: '2024-01-22T09:30:00Z',
-        userName: 'admin'
-      },
-    ];
+      error: (error) => {
+        console.error('Error cargando máquinas virtuales:', error);
+        this.toastr.error('No se pudieron cargar las máquinas virtuales.', 'Error');
+        this.isLoadingVMs = false;
+      }
+    });
   }
 
   /**
@@ -268,5 +238,14 @@ export class DashboardComponent implements OnInit {
           // El interceptor manejará automáticamente los errores 401
         }
       });
+  }
+
+  /**
+   * Redirige a la página de gestión de suscripción.
+   * NOTA: La página de destino aún debe ser creada.
+   */
+  manageSubscription(): void {
+    this.toastr.info('La gestión de suscripciones estará disponible próximamente.', 'En desarrollo');
+    // this.router.navigate(['/account/subscription']);
   }
 } 

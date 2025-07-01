@@ -9,6 +9,7 @@ ArgCloud es una plataforma completa para la gestión de máquinas virtuales en l
 - **Base de datos PostgreSQL**: Almacenamiento confiable
 - **Autenticación JWT**: Sistema de autenticación seguro
 - **Verificación por email**: Registro seguro con confirmación
+- **Recuperación de contraseña**: Flujo seguro para restablecer la contraseña por email
 - **Gestión completa de VMs**: Crear, administrar y monitorear máquinas virtuales
 - **Sistema de Planes de Hardware**: Planes parametrizables con recursos específicos
 - **Pagos con Mercado Pago**: Integración completa con CardForm y webhooks
@@ -240,30 +241,32 @@ LandingPage/
 │   │   ├── controller/        # Controladores REST
 │   │   │   ├── AuthController.java
 │   │   │   ├── DashboardController.java
-│   │   │   ├── PaymentController.java      # NEW: Gestión de pagos
+│   │   │   ├── HardwarePlanController.java
+│   │   │   ├── PaymentController.java
+│   │   │   ├── SubscriptionController.java
 │   │   │   └── VirtualMachineController.java
 │   │   ├── service/          # Lógica de negocio
 │   │   │   ├── EmailService.java
-│   │   │   ├── MercadoPagoService.java     # NEW: Integración MP
+│   │   │   ├── MercadoPagoService.java
 │   │   │   ├── UserService.java
 │   │   │   └── VirtualMachineService.java
 │   │   ├── repository/       # Acceso a datos
-│   │   │   ├── HardwarePlanRepository.java # NEW: Planes
-│   │   │   ├── PaymentRepository.java      # NEW: Pagos
+│   │   │   ├── HardwarePlanRepository.java
+│   │   │   ├── PaymentRepository.java
 │   │   │   ├── UserRepository.java
-│   │   │   ├── UserSubscriptionRepository.java # NEW: Suscripciones
+│   │   │   ├── UserSubscriptionRepository.java
 │   │   │   └── VirtualMachineRepository.java
 │   │   ├── entity/           # Entidades JPA
-│   │   │   ├── HardwarePlan.java          # NEW: Plan de hardware
-│   │   │   ├── Payment.java               # NEW: Registro de pagos
+│   │   │   ├── HardwarePlan.java
+│   │   │   ├── Payment.java
 │   │   │   ├── User.java
-│   │   │   ├── UserSubscription.java      # NEW: Suscripción del usuario
+│   │   │   ├── UserSubscription.java
 │   │   │   └── VirtualMachine.java
 │   │   ├── dto/              # Data Transfer Objects
-│   │   │   ├── HardwarePlanResponse.java  # NEW: Response de planes
-│   │   │   ├── PaymentRequest.java        # NEW: Request de pago
-│   │   │   ├── PaymentResponse.java       # NEW: Response de pago
-│   │   │   ├── UserSubscriptionResponse.java # NEW: Response de suscripción
+│   │   │   ├── HardwarePlanResponse.java
+│   │   │   ├── PaymentRequest.java
+│   │   │   ├── PaymentResponse.java
+│   │   │   ├── UserSubscriptionResponse.java
 │   │   │   └── ...
 │   │   ├── config/           # Configuraciones
 │   │   └── util/             # Utilidades
@@ -274,18 +277,18 @@ LandingPage/
 ├── frontend/                   # Aplicación Angular
 │   ├── src/app/
 │   │   ├── components/       # Componentes Angular
-│   │   │   ├── checkout/            # NEW: Checkout con Mercado Pago
+│   │   │   ├── checkout/            # Checkout con Mercado Pago
 │   │   │   ├── dashboard/           # Dashboard principal
-│   │   │   ├── pricing/             # NEW: Página de planes
-│   │   │   ├── resource-summary/    # NEW: Dashboard de recursos
+│   │   │   ├── pricing/             # Página de planes
+│   │   │   ├── resource-summary/    # Dashboard de recursos
 │   │   │   ├── virtual-machines/    # Gestión de VMs
 │   │   │   └── ...
 │   │   ├── services/         # Servicios
-│   │   │   ├── hardware-plan.service.ts # NEW: Servicio de planes
+│   │   │   ├── hardware-plan.service.ts # Servicio de planes
 │   │   │   ├── virtual-machine.service.ts
 │   │   │   └── ...
 │   │   ├── models/           # Modelos TypeScript
-│   │   │   ├── hardware-plan.model.ts   # NEW: Modelos de planes
+│   │   │   ├── hardware-plan.model.ts   # Modelos de planes
 │   │   │   ├── virtual-machine.model.ts
 │   │   │   └── ...
 │   │   ├── guards/           # Guards de rutas
@@ -312,12 +315,21 @@ LandingPage/
 3. Se genera JWT token
 4. Token se usa para autenticar requests posteriores
 
+### Flujo de Recuperación de Contraseña
+1. Usuario ingresa su email en el formulario de "Olvidé mi contraseña"
+2. El sistema genera un token de restablecimiento único y lo envía al email del usuario
+3. Usuario hace clic en el enlace del email, que lo redirige a una página para crear una nueva contraseña
+4. El usuario ingresa y confirma la nueva contraseña
+5. La contraseña se actualiza en la base de datos de forma segura
+
 ## 🌐 API Endpoints
 
 ### Autenticación (`/api/auth`)
 - `POST /login` - Iniciar sesión
 - `POST /register` - Registrar usuario
 - `GET /verify-email?token=...` - Verificar email
+- `POST /forgot-password` - Solicitar token para restablecer contraseña
+- `POST /reset-password` - Restablecer contraseña con token
 
 ### Dashboard (`/api/dashboard`) - Requiere autenticación
 - `GET /welcome` - Mensaje de bienvenida
@@ -501,6 +513,7 @@ El sistema maneja automáticamente las notificaciones de Mercado Pago:
 - [x] **Gestión completa de máquinas virtuales**
 - [x] **Interfaz gráfica para VMs**
 - [x] **Integración con Proxmox preparada**
+- [x] **Recuperación de contraseña por email**
 - [x] **Términos y condiciones**
 - [x] **Sistema de planes de hardware parametrizables**
 - [x] **Integración completa con Mercado Pago**

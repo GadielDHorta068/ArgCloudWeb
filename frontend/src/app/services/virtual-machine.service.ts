@@ -32,7 +32,6 @@ export class VirtualMachineService {
    * Maneja errores de las peticiones HTTP
    */
   private handleError(error: any): Observable<never> {
-    console.error('Error en VirtualMachineService:', error);
     let errorMessage = 'Ha ocurrido un error inesperado';
     
     if (error.error?.message) {

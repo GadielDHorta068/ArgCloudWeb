@@ -45,4 +45,16 @@ export interface AuthResponse {
  */
 export interface MessageResponse {
   message: string;
+}
+
+/** Solicitud para el proceso de olvido de contraseña */
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+/** Solicitud para restablecer la contraseña */
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword?: string;
+  confirmPassword?: string;
 } 

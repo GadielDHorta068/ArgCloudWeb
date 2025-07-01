@@ -1,27 +1,29 @@
 /* ===================================================
-   PRICING COMPONENT STYLES - VERSIÓN SIMPLIFICADA
-   Estilos limpios y coherentes para los planes de hardware.
+   PRICING COMPONENT STYLES - TEMA OSCURO
+   Estilos coherentes con la estética de la aplicación.
    =================================================== */
 
 /* ================== Contenedor Principal ================== */
 .pricing-component {
-  background-color: #f8f9fa; /* Un fondo más suave y estándar */
+  background-color: var(--bs-dark); /* Fondo oscuro principal */
+  color: var(--bs-light);
 }
 
 /* ================== Cabecera de la Página ================== */
 .page-header {
   padding: 4rem 0;
-  background-color: #ffffff;
-  border-bottom: 1px solid #dee2e6;
+  background-color: #111827; /* Un azul muy oscuro */
+  border-bottom: 1px solid rgba(0, 255, 255, 0.1);
 }
 
 .page-header h1 {
   font-weight: 700;
-  color: #343a40;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
 }
 
 .page-header .lead {
-  color: #6c757d;
+  color: #adb5bd; /* Texto secundario más claro */
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
@@ -29,18 +31,23 @@
 
 /* ================== Selector de Facturación ================== */
 .billing-toggle .btn-group {
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .billing-toggle .btn {
   font-weight: 600;
   padding: 0.75rem 1.5rem;
+  background-color: #1f2937;
+  color: #adb5bd;
+  border-color: rgba(0, 255, 255, 0.2);
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .billing-toggle .btn-check:checked + .btn {
-  background-color: #0d6efd; /* Azul primario de Bootstrap */
-  color: white;
+  background-color: #00ffff;
+  color: #111827;
+  border-color: #00ffff;
+  text-shadow: none;
 }
 
 .billing-toggle .badge {
@@ -50,41 +57,43 @@
 
 /* ================== Tarjetas de Planes (Cards) ================== */
 .plan-card {
-  border-radius: 0.75rem; /* Bordes más sutiles */
-  border: 1px solid #dee2e6;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(0, 255, 255, 0.2);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  background-color: #ffffff;
+  background-color: #1f2937; /* Color base de la tarjeta */
+  color: #e5e7eb;
 }
 
 .plan-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 255, 255, 0.1);
+  border-color: rgba(0, 255, 255, 0.5);
 }
 
 /* Plan Popular y Plan Actual */
 .plan-card.is-popular {
-  border-color: #0d6efd;
-  box-shadow: 0 0.5rem 2rem rgba(13, 110, 253, 0.2);
+  border-color: #00ffff;
+  box-shadow: 0 0.5rem 2rem rgba(0, 255, 255, 0.15);
 }
 
 .plan-card.is-current {
   border-color: #198754; /* Verde de Bootstrap */
-  box-shadow: 0 0.5rem 2rem rgba(25, 135, 84, 0.2);
+  box-shadow: 0 0.5rem 2rem rgba(25, 135, 84, 0.15);
 }
 
 /* Insignia de "Más Popular" */
 .popular-badge {
   font-size: 0.8rem;
   font-weight: 700;
-  background-color: #0d6efd;
-  color: white;
-  border: 2px solid white;
+  background-color: #00ffff;
+  color: #111827;
+  border: 2px solid #1f2937;
 }
 
 /* ================== Cabecera de la Tarjeta ================== */
 .plan-card .card-header {
-  border-bottom: 1px solid #dee2e6;
-  background-color: #f8f9fa; /* Fondo neutro */
+  border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+  background-color: #111827; /* Fondo más oscuro para el header */
   padding: 1.5rem;
 }
 
@@ -96,11 +105,11 @@
 .plan-card .card-header .card-title {
   font-weight: 700;
   font-size: 1.5rem;
-  color: #212529;
+  color: #ffffff;
 }
 
 .plan-card .card-header .card-text {
-  color: #6c757d;
+  color: #adb5bd;
 }
 
 /* ================== Cuerpo de la Tarjeta ================== */
@@ -116,25 +125,25 @@
 .price-display .price {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #212529;
+  color: #00ffff; /* Color cian para el precio */
 }
 
 .price-display .billing-cycle {
   font-size: 1rem;
-  color: #6c757d;
+  color: #adb5bd;
   font-weight: 500;
 }
 
 /* Especificaciones de Recursos */
 .resource-specs .spec-item {
-  background-color: #f8f9fa;
+  background-color: rgba(17, 24, 39, 0.8); /* Un poco más oscuro que el fondo de la tarjeta */
   border-radius: 0.5rem;
   padding: 1rem;
   transition: background-color 0.3s ease;
 }
 
 .resource-specs .spec-item:hover {
-  background-color: #e9ecef;
+  background-color: rgba(17, 24, 39, 1);
 }
 
 .resource-specs .spec-item i {
@@ -144,11 +153,13 @@
 
 .resource-specs .spec-item .fw-bold {
   font-size: 1.1rem;
+  color: #ffffff;
 }
 
 .resource-specs .spec-item .text-muted {
   font-size: 0.8rem;
   text-transform: uppercase;
+  color: #adb5bd !important;
 }
 
 /* Lista de Características */
@@ -160,26 +171,26 @@
   padding: 0.5rem 0;
   display: flex;
   align-items: center;
-  color: #495057;
+  color: #d1d5db;
 }
 
 .features-list li i {
-  color: #198754; /* Icono verde */
+  color: #00ffff; /* Icono cian */
   width: 25px;
 }
 
 /* Nivel de Soporte */
 .support-level {
-  background-color: #f8f9fa;
+  background-color: #111827;
   border-radius: 0.5rem;
-  border-left: 4px solid #0d6efd;
+  border-left: 4px solid #00ffff;
   padding: 0.75rem 1rem;
 }
 
 /* ================== Pie de la Tarjeta ================== */
 .plan-card .card-footer {
-  background-color: #ffffff;
-  border-top: 1px solid #dee2e6;
+  background-color: transparent;
+  border-top: 1px solid rgba(0, 255, 255, 0.1);
   padding: 1.5rem;
 }
 
@@ -189,10 +200,31 @@
   width: 100%;
 }
 
+/* Botones específicos */
+.btn-primary {
+  background-color: #00ffff;
+  border-color: #00ffff;
+  color: #111827;
+}
+.btn-primary:hover {
+  background-color: #ffffff;
+  border-color: #ffffff;
+}
+
+.btn-outline-primary {
+  color: #00ffff;
+  border-color: #00ffff;
+}
+.btn-outline-primary:hover {
+  background-color: #00ffff;
+  color: #111827;
+}
+
+
 /* ================== Sección de Ayuda ================== */
 .help-section {
   padding: 4rem 0;
-  background-color: #343a40;
+  background-color: #111827; /* Fondo oscuro */
   color: white;
 }
 
@@ -213,4 +245,10 @@
 .loading-state,
 .empty-state {
   padding: 4rem 0;
+  color: #adb5bd;
+}
+
+.loading-state .spinner-border,
+.empty-state i {
+  color: #00ffff !important;
 } 

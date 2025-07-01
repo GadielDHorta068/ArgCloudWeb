@@ -48,4 +48,32 @@ public class EmailService {
         
         emailSender.send(message);
     }
+
+    /**
+     * Envía un correo de restablecimiento de contraseña.
+     *
+     * @param to la dirección de correo electrónico del destinatario.
+     * @param token el token de restablecimiento a incluir en el correo.
+     */
+    public void sendPasswordResetEmail(String to, String token) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(fromEmail);
+        message.setTo(to);
+        message.setSubject("Restablecimiento de Contraseña - ArgCloud");
+
+        String resetUrl = frontendUrl + "/reset-password?token=" + token;
+
+        String messageText = "Hola,\n\n" +
+                "Hemos recibido una solicitud para restablecer tu contraseña en ArgCloud.\n\n" +
+                "Para restablecer tu contraseña, haz clic en el siguiente enlace:\n" +
+                resetUrl + "\n\n" +
+                "Este enlace expirará en 1 hora.\n\n" +
+                "Si no solicitaste un restablecimiento de contraseña, puedes ignorar este email.\n\n" +
+                "Saludos,\n" +
+                "El equipo de ArgCloud";
+
+        message.setText(messageText);
+
+        emailSender.send(message);
+    }
 } 

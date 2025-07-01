@@ -67,4 +67,34 @@ public class AuthController {
                     .body(new MessageResponse("Error: " + e.getMessage()));
         }
     }
+
+    /**
+     * Inicia el proceso de restablecimiento de contraseña.
+     * @param forgotPasswordRequest la solicitud con el email del usuario.
+     * @return una respuesta con un mensaje de éxito.
+     */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        String message = userService.forgotPassword(forgotPasswordRequest.getEmail());
+        return ResponseEntity.ok(new MessageResponse(message));
+    }
+
+    /**
+     * Restablece la contraseña utilizando un token.
+     * @param resetPasswordRequest la solicitud con el token y la nueva contraseña.
+     * @return una respuesta con un mensaje de éxito o de error.
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+        if (!resetPasswordRequest.getNewPassword().equals(resetPasswordRequest.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Las contraseñas no coinciden."));
+        }
+        try {
+            String message = userService.resetPassword(resetPasswordRequest);
+            return ResponseEntity.ok(new MessageResponse(message));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Error: " + e.getMessage()));
+        }
+    }
 } 

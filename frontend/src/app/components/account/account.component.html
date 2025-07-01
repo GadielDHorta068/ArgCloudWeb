@@ -1,0 +1,97 @@
+<div class="container mt-5">
+  <div class="row">
+    <!-- Columna de navegación -->
+    <div class="col-md-3">
+      <div class="list-group">
+        <a href="#account-details" class="list-group-item list-group-item-action active" (click)="showSection('details', $event)">
+          <i class="fas fa-user-circle me-2"></i> Mis Datos
+        </a>
+        <a href="#change-password" class="list-group-item list-group-item-action" (click)="showSection('password', $event)">
+          <i class="fas fa-key me-2"></i> Cambiar Contraseña
+        </a>
+        <a href="#danger-zone" class="list-group-item list-group-item-action" (click)="showSection('danger', $event)">
+          <i class="fas fa-exclamation-triangle me-2"></i> Zona de Peligro
+        </a>
+      </div>
+    </div>
+
+    <!-- Columna de contenido -->
+    <div class="col-md-9">
+      <!-- Sección Mis Datos -->
+      <div id="account-details" *ngIf="activeSection === 'details'">
+        <div class="card">
+          <div class="card-header">
+            <h4><i class="fas fa-user-edit me-2"></i> Información de la Cuenta</h4>
+          </div>
+          <div class="card-body" *ngIf="currentUser">
+            <form>
+              <div class="mb-3">
+                <label for="firstName" class="form-label">Nombre</label>
+                <input type="text" id="firstName" class="form-control" [value]="currentUser.firstName" disabled>
+              </div>
+              <div class="mb-3">
+                <label for="lastName" class="form-label">Apellido</label>
+                <input type="text" id="lastName" class="form-control" [value]="currentUser.lastName" disabled>
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <div class="input-group">
+                  <input type="email" id="email" class="form-control" [value]="currentUser.email" disabled>
+                  <span class="input-group-text" *ngIf="currentUser.emailVerified">
+                    <i class="fas fa-check-circle text-success" title="Verificado"></i>
+                  </span>
+                  <span class="input-group-text" *ngIf="!currentUser.emailVerified">
+                    <i class="fas fa-exclamation-triangle text-warning" title="No verificado"></i>
+                  </span>
+                </div>
+              </div>
+              <button type="submit" class="btn btn-primary" disabled>Guardar Cambios (Próximamente)</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección Cambiar Contraseña -->
+      <div id="change-password" *ngIf="activeSection === 'password'">
+        <div class="card">
+          <div class="card-header">
+            <h4><i class="fas fa-lock me-2"></i> Cambiar Contraseña</h4>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="mb-3">
+                <label for="current-password" class="form-label">Contraseña Actual</label>
+                <input type="password" id="current-password" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="new-password" class="form-label">Nueva Contraseña</label>
+                <input type="password" id="new-password" class="form-control">
+              </div>
+              <div class="mb-3">
+                <label for="confirm-password" class="form-label">Confirmar Nueva Contraseña</label>
+                <input type="password" id="confirm-password" class="form-control">
+              </div>
+              <button type="submit" class="btn btn-success">Actualizar Contraseña</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección Zona de Peligro -->
+      <div id="danger-zone" *ngIf="activeSection === 'danger'">
+        <div class="card border-danger">
+          <div class="card-header bg-danger text-white">
+            <h4><i class="fas fa-trash-alt me-2"></i> Eliminar Cuenta</h4>
+          </div>
+          <div class="card-body">
+            <p>
+              Esta acción es irreversible. Se eliminarán todos tus datos, máquinas virtuales y suscripciones.
+              Por favor, asegúrate de que realmente deseas continuar.
+            </p>
+            <button type="button" class="btn btn-danger">Eliminar mi cuenta permanentemente</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

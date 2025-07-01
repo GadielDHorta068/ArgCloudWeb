@@ -124,11 +124,6 @@ export class HardwarePlanService {
    * @returns Observable con la respuesta del pago
    */
   createPaymentWithCardForm(paymentData: any): Observable<PaymentResponse> {
-    // Debug: verificar headers de autenticación
-    const token = localStorage.getItem('token');
-    console.log('🔍 Token en localStorage:', !!token);
-    console.log('🔍 Enviando petición de pago a:', `${this.apiUrl}/payments/create`);
-    
     return this.http.post<PaymentResponse>(`${this.apiUrl}/payments/create`, paymentData);
   }
 
@@ -138,12 +133,6 @@ export class HardwarePlanService {
    * @returns Observable con la respuesta del pago.
    */
   createPayment(createPaymentData: any): Observable<PaymentResponse> {
-    // Debug: verificar headers de autenticación
-    const token = localStorage.getItem('token');
-    console.log('🔍 Token en localStorage:', !!token);
-    console.log('🔍 Enviando petición de pago a:', `${this.apiUrl}/payments/create`);
-    console.log('🔍 Datos de pago:', createPaymentData);
-    
     return this.http.post<PaymentResponse>(`${this.apiUrl}/payments/create`, createPaymentData);
   }
 

@@ -539,6 +539,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       : this.selectedPlan.monthlyPrice;
     
     return this.hardwarePlanService.formatPrice(price);
+
   }
 
   /**
