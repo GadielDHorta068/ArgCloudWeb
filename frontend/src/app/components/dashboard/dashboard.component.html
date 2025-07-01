@@ -59,16 +59,16 @@
             </div>
             
             <!-- Resource Usage -->
-            <div class="col-md-8">
-              <h6 class="text-muted mb-3">Uso de Recursos</h6>
+            <div class="col-md-8 resource-usage-section">
+              <h6 class="resource-label mb-3">Uso de Recursos</h6>
               <div class="row">
                 <!-- CPU Usage -->
                 <div class="col-sm-6 mb-3">
                   <div class="d-flex justify-content-between align-items-center mb-1">
-                    <small class="text-muted">CPU</small>
-                    <small class="text-muted">{{ currentSubscription.usedCpu || 0 }} / {{ currentSubscription.plan?.totalCpu || 0 }} vCPU</small>
+                    <small class="resource-label">CPU</small>
+                    <small class="resource-value">{{ currentSubscription.usedCpu || 0 }} / {{ currentSubscription.plan?.totalCpu || 0 }} vCPU</small>
                   </div>
-                  <div class="progress" style="height: 8px;">
+                  <div class="progress" style="height: 10px;">
                     <div class="progress-bar" 
                          [class]="getProgressClass(getResourceUsagePercentage(currentSubscription.usedCpu || 0, currentSubscription.plan?.totalCpu || 1))"
                          [style.width.%]="getResourceUsagePercentage(currentSubscription.usedCpu || 0, currentSubscription.plan?.totalCpu || 1)">
@@ -79,10 +79,10 @@
                 <!-- Memory Usage -->
                 <div class="col-sm-6 mb-3">
                   <div class="d-flex justify-content-between align-items-center mb-1">
-                    <small class="text-muted">Memoria</small>
-                    <small class="text-muted">{{ (currentSubscription.usedMemory || 0) / 1024 | number:'1.1-1' }} / {{ (currentSubscription.plan?.totalMemory || 0) / 1024 | number:'1.1-1' }} GB</small>
+                    <small class="resource-label">Memoria</small>
+                    <small class="resource-value">{{ (currentSubscription.usedMemory || 0) / 1024 | number:'1.1-1' }} / {{ (currentSubscription.plan?.totalMemory || 0) / 1024 | number:'1.1-1' }} GB</small>
                   </div>
-                  <div class="progress" style="height: 8px;">
+                  <div class="progress" style="height: 10px;">
                     <div class="progress-bar" 
                          [class]="getProgressClass(getResourceUsagePercentage(currentSubscription.usedMemory || 0, currentSubscription.plan?.totalMemory || 1))"
                          [style.width.%]="getResourceUsagePercentage(currentSubscription.usedMemory || 0, currentSubscription.plan?.totalMemory || 1)">
@@ -93,10 +93,10 @@
                 <!-- Disk Usage -->
                 <div class="col-sm-6 mb-3">
                   <div class="d-flex justify-content-between align-items-center mb-1">
-                    <small class="text-muted">Almacenamiento</small>
-                    <small class="text-muted">{{ currentSubscription.usedDisk || 0 }} / {{ currentSubscription.plan?.totalDisk || 0 }} GB</small>
+                    <small class="resource-label">Almacenamiento</small>
+                    <small class="resource-value">{{ currentSubscription.usedDisk || 0 }} / {{ currentSubscription.plan?.totalDisk || 0 }} GB</small>
                   </div>
-                  <div class="progress" style="height: 8px;">
+                  <div class="progress" style="height: 10px;">
                     <div class="progress-bar" 
                          [class]="getProgressClass(getResourceUsagePercentage(currentSubscription.usedDisk || 0, currentSubscription.plan?.totalDisk || 1))"
                          [style.width.%]="getResourceUsagePercentage(currentSubscription.usedDisk || 0, currentSubscription.plan?.totalDisk || 1)">
@@ -107,10 +107,10 @@
                 <!-- VMs Usage -->
                 <div class="col-sm-6 mb-3">
                   <div class="d-flex justify-content-between align-items-center mb-1">
-                    <small class="text-muted">Máquinas Virtuales</small>
-                    <small class="text-muted">{{ currentSubscription.currentVMs || 0 }} / {{ currentSubscription.plan?.maxVMs || 0 }} VMs</small>
+                    <small class="resource-label">Máquinas Virtuales</small>
+                    <small class="resource-value">{{ currentSubscription.currentVMs || 0 }} / {{ currentSubscription.plan?.maxVMs || 0 }} VMs</small>
                   </div>
-                  <div class="progress" style="height: 8px;">
+                  <div class="progress" style="height: 10px;">
                     <div class="progress-bar" 
                          [class]="getProgressClass(getResourceUsagePercentage(currentSubscription.currentVMs || 0, currentSubscription.plan?.maxVMs || 1))"
                          [style.width.%]="getResourceUsagePercentage(currentSubscription.currentVMs || 0, currentSubscription.plan?.maxVMs || 1)">
@@ -131,7 +131,7 @@
                 </button>
                 <button type="button" class="btn btn-outline-secondary" (click)="manageSubscription()">
                   <i class="fas fa-cog me-2"></i>
-                  Gestionar Suscripción
+                  Gestionar Cuenta
                 </button>
                 <button type="button" class="btn btn-outline-info" (click)="loadCurrentSubscription()">
                   <i class="fas fa-sync-alt me-2"></i>

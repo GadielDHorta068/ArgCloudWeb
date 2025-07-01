@@ -1,360 +1,97 @@
-/* Checkout Component Styles - Dark Theme */
+/* Checkout Component Styles - Unificado con el Tema Oscuro Global */
 
-/* Container Principal con gradiente oscuro */
+/* El contenedor principal debe ser transparente para mostrar el fondo del body */
 .container-fluid {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background: transparent;
   min-height: 100vh;
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* Efecto de partículas en el fondo */
-.container-fluid::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.15) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-.container {
   position: relative;
   z-index: 1;
 }
 
-/* Header con gradiente */
 .display-5 {
-  background: linear-gradient(135deg, #00d4ff 0%, #007bff 50%, #6f42c1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 800;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  color: #00ffff;
+  font-weight: 700;
+  text-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
 }
 
 .lead {
   color: rgba(255, 255, 255, 0.8);
-  font-weight: 300;
 }
 
-/* Card Styles con tema oscuro */
+/* Estilos de Card unificados */
 .card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
-  box-shadow: 
-    0 20px 40px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.05);
-  transition: all 0.3s ease;
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 
-    0 30px 60px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
+  background-color: rgba(27, 39, 53, 0.4);
+  border: 1px solid rgba(0, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
+  border-radius: 15px;
 }
 
 .card-header {
-  background: linear-gradient(135deg, rgba(0, 123, 255, 0.8) 0%, rgba(111, 66, 193, 0.8) 100%);
-  border-radius: 20px 20px 0 0 !important;
-  border: none;
-  padding: 1.5rem 2rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(0, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 15px 15px 0 0 !important;
 }
 
 .card-header h5 {
-  color: white;
+  color: #00ffff;
   font-weight: 600;
-  margin: 0;
-}
-
-.card-header small {
-  color: rgba(255, 255, 255, 0.8);
 }
 
 .card-body {
-  padding: 2rem;
-  color: #e0e0e0;
+  color: rgba(255, 255, 255, 0.8);
 }
 
-/* Plan Summary Card - Específico */
 .border-primary {
-  border: 2px solid #007bff !important;
-  background: rgba(0, 123, 255, 0.1);
+  border: 1px solid #00ffff !important;
 }
 
-.border-primary .card-header {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-}
-
-/* Text Colors */
-.text-primary {
-  color: #00d4ff !important;
-}
-
-.text-muted {
-  color: rgba(255, 255, 255, 0.6) !important;
-}
-
-.fw-bold {
-  color: #ffffff;
-}
-
-/* Form Styles con tema oscuro */
-#form-checkout {
-  position: relative;
-}
-
+/* Estilos de Formulario unificados */
 .form-label {
   font-weight: 600;
-  color: #ffffff;
-  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
 }
 
+/* Hereda .form-control de styles.css, pero se puede añadir especificidad si es necesario */
 .form-control, .form-select {
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 0.75rem 1rem;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  color: #ffffff;
-  backdrop-filter: blur(10px);
+    background-color: rgba(9, 10, 15, 0.8);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    color: white;
 }
 
 .form-control:focus, .form-select:focus {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: #00d4ff;
-  box-shadow: 0 0 0 0.2rem rgba(0, 212, 255, 0.25);
-  color: #ffffff;
-  outline: none;
-}
-
-.form-control::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-  font-style: italic;
+    background-color: rgba(9, 10, 15, 0.9);
+    border-color: #00ffff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
 }
 
 .form-select option {
-  background: #1a1a2e;
-  color: #ffffff;
-}
-
-/* Required Field Indicator */
-.text-danger {
-  color: #ff6b6b !important;
-  font-weight: bold;
-}
-
-/* MercadoPago Form Fields - Override con tema oscuro */
-#form-checkout__cardNumber,
-#form-checkout__expirationDate,
-#form-checkout__securityCode,
-#form-checkout__cardholderName,
-#form-checkout__cardholderEmail,
-#form-checkout__identificationType,
-#form-checkout__identificationNumber,
-#form-checkout__installments,
-#form-checkout__issuer {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 2px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 12px !important;
-  padding: 0.75rem 1rem !important;
-  font-size: 1rem !important;
-  color: #ffffff !important;
-  backdrop-filter: blur(10px) !important;
-  transition: all 0.3s ease !important;
-}
-
-#form-checkout__cardNumber:focus,
-#form-checkout__expirationDate:focus,
-#form-checkout__securityCode:focus,
-#form-checkout__cardholderName:focus,
-#form-checkout__cardholderEmail:focus,
-#form-checkout__identificationType:focus,
-#form-checkout__identificationNumber:focus,
-#form-checkout__installments:focus,
-#form-checkout__issuer:focus {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border-color: #00d4ff !important;
-  box-shadow: 0 0 0 0.2rem rgba(0, 212, 255, 0.25) !important;
-  outline: none !important;
-}
-
-/* Placeholders para campos de MercadoPago */
-#form-checkout__cardNumber::placeholder,
-#form-checkout__expirationDate::placeholder,
-#form-checkout__securityCode::placeholder {
-  color: rgba(255, 255, 255, 0.5) !important;
-}
-
-/* Button Styles con gradientes vibrantes */
-.btn {
-  border-radius: 12px;
-  padding: 0.75rem 2rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  border: none;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.btn:hover::before {
-  left: 100%;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #00d4ff 0%, #007bff 50%, #6f42c1 100%);
+  background: #090a0f;
   color: white;
-  box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
 }
 
-.btn-primary:hover {
-  background: linear-gradient(135deg, #00b8e6 0%, #0056b3 50%, #5a32a3 100%);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 35px rgba(0, 123, 255, 0.5);
+/* MercadoPago Form Fields - Aplicar estilos unificados */
+#form-checkout [id^="form-checkout__"] {
+  background-color: rgba(9, 10, 15, 0.8) !important;
+  border: 1px solid rgba(0, 255, 255, 0.2) !important;
+  color: white !important;
+  border-radius: 5px !important;
 }
 
-.btn-primary:disabled {
-  background: rgba(108, 117, 125, 0.6);
-  transform: none;
-  box-shadow: none;
-  color: rgba(255, 255, 255, 0.5);
+#form-checkout [id^="form-checkout__"]:focus {
+  background-color: rgba(9, 10, 15, 0.9) !important;
+  border-color: #00ffff !important;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3) !important;
 }
 
-.btn-outline-secondary {
-  background: rgba(255, 255, 255, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
-}
+/* Estilos de Botón unificados */
+/* Se usarán las clases .btn y .btn-primary de styles.css */
 
-.btn-outline-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.4);
-  color: white;
-  transform: translateY(-2px);
-}
-
-/* Loading States */
-.spinner-border {
-  animation: spin 1s linear infinite;
-}
-
-.spinner-border-sm {
-  color: #00d4ff;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Payment Security Info */
+/* Alertas unificadas */
 .alert-info {
-  background: rgba(23, 162, 184, 0.1);
-  border: 1px solid rgba(23, 162, 184, 0.3);
-  border-radius: 12px;
-  color: #00d4ff;
-  backdrop-filter: blur(10px);
+    background-color: rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.3);
+    color: #00ffff;
 }
-
-/* Icons */
-.fas, .fab {
-  color: inherit;
-}
-
-.fa-credit-card {
-  color: #00d4ff;
-}
-
-.fa-lock, .fa-shield-alt {
-  color: #28a745;
-}
-
-.fa-user {
-  color: #ffc107;
-}
-
-/* Resource Summary específico */
-.text-end h4 {
-  background: linear-gradient(135deg, #00d4ff 0%, #007bff 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 800;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .card-body {
-    padding: 1.5rem;
-  }
-  
-  .display-5 {
-    font-size: 2rem;
-  }
-  
-  .btn {
-    padding: 0.75rem 1.5rem;
-  }
-}
-
-@media (max-width: 576px) {
-  .card-body {
-    padding: 1rem;
-  }
-  
-  .col-md-6 {
-    margin-bottom: 1rem;
-  }
-  
-  .btn {
-    width: 100%;
-    margin-bottom: 0.5rem;
-  }
-}
-
-/* Animaciones suaves */
-.card, .btn, .form-control {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.col-md-6:nth-child(1) { animation-delay: 0s; }
-.col-md-6:nth-child(2) { animation-delay: 0.1s; }
-.col-md-6:nth-child(3) { animation-delay: 0.2s; }
-.col-md-6:nth-child(4) { animation-delay: 0.3s; }
 
 /* Scrollbar personalizado */
 ::-webkit-scrollbar {
@@ -362,24 +99,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
+  background: rgba(9, 10, 15, 0.8);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #00d4ff 0%, #007bff 100%);
+  background: rgba(0, 255, 255, 0.3);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #00b8e6 0%, #0056b3 100%);
+  background: rgba(0, 255, 255, 0.5);
 }
-
-/* Loading overlay */
-.text-center.py-5 {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.spinner-border-primary {
-  color: #00d4ff;
-} 

@@ -6,6 +6,9 @@
         <a href="#account-details" class="list-group-item list-group-item-action active" (click)="showSection('details', $event)">
           <i class="fas fa-user-circle me-2"></i> Mis Datos
         </a>
+        <a href="#subscription-info" class="list-group-item list-group-item-action" (click)="showSection('subscription', $event)">
+          <i class="fas fa-credit-card me-2"></i> Mi Suscripción
+        </a>
         <a href="#change-password" class="list-group-item list-group-item-action" (click)="showSection('password', $event)">
           <i class="fas fa-key me-2"></i> Cambiar Contraseña
         </a>
@@ -24,19 +27,22 @@
             <h4><i class="fas fa-user-edit me-2"></i> Información de la Cuenta</h4>
           </div>
           <div class="card-body" *ngIf="currentUser">
-            <form>
+            <form #userInfoForm="ngForm" (ngSubmit)="updateUserInfo()">
               <div class="mb-3">
                 <label for="firstName" class="form-label">Nombre</label>
-                <input type="text" id="firstName" class="form-control" [value]="currentUser.firstName" disabled>
+                <input type="text" id="firstName" name="firstName" class="form-control" 
+                       [(ngModel)]="userForm.firstName" required>
               </div>
               <div class="mb-3">
                 <label for="lastName" class="form-label">Apellido</label>
-                <input type="text" id="lastName" class="form-control" [value]="currentUser.lastName" disabled>
+                <input type="text" id="lastName" name="lastName" class="form-control" 
+                       [(ngModel)]="userForm.lastName" required>
               </div>
               <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <div class="input-group">
-                  <input type="email" id="email" class="form-control" [value]="currentUser.email" disabled>
+                  <input type="email" id="email" name="email" class="form-control" 
+                         [(ngModel)]="userForm.email" required disabled>
                   <span class="input-group-text" *ngIf="currentUser.emailVerified">
                     <i class="fas fa-check-circle text-success" title="Verificado"></i>
                   </span>
@@ -44,9 +50,128 @@
                     <i class="fas fa-exclamation-triangle text-warning" title="No verificado"></i>
                   </span>
                 </div>
+                <small class="form-text text-muted">El email no se puede cambiar por razones de seguridad</small>
               </div>
-              <button type="submit" class="btn btn-primary" disabled>Guardar Cambios (Próximamente)</button>
+              <button type="submit" class="btn btn-primary" [disabled]="!userInfoForm.valid || isUpdatingProfile">
+                <span *ngIf="isUpdatingProfile" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <i *ngIf="!isUpdatingProfile" class="fas fa-save me-2"></i>
+                {{ isUpdatingProfile ? 'Guardando...' : 'Guardar Cambios' }}
+              </button>
             </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección Mi Suscripción -->
+      <div id="subscription-info" *ngIf="activeSection === 'subscription'">
+        <div class="card">
+          <div class="card-header">
+            <h4><i class="fas fa-credit-card me-2"></i> Mi Suscripción</h4>
+          </div>
+          <div class="card-body">
+            <!-- Cargando suscripción -->
+            <div *ngIf="isLoadingSubscription" class="text-center">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando información de suscripción...</span>
+              </div>
+              <p class="mt-2 text-muted">Cargando tu suscripción...</p>
+            </div>
+
+            <!-- Con suscripción activa -->
+            <div *ngIf="!isLoadingSubscription && currentSubscription" class="row">
+              <div class="col-md-6">
+                <div class="card border-success">
+                  <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                      <i class="fas fa-star me-2"></i>
+                      {{ currentSubscription.plan.name }}
+                    </h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Estado:</label>
+                      <span [class]="getSubscriptionStatusClass()" class="ms-2">
+                        {{ getSubscriptionStatusText() }}
+                      </span>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Tipo:</label>
+                      <span class="ms-2">{{ getSubscriptionTypeText() }}</span>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Precio:</label>
+                      <span class="ms-2 text-success fw-bold">{{ getCurrentPrice() }}</span>
+                      <span class="text-muted">/ {{ currentSubscription.subscriptionType === 'yearly' ? 'año' : 'mes' }}</span>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Fecha de inicio:</label>
+                      <span class="ms-2">{{ currentSubscription.startDate | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Fecha de renovación:</label>
+                      <span class="ms-2">{{ currentSubscription.endDate | date:'dd/MM/yyyy' }}</span>
+                    </div>
+                    <div class="mt-3">
+                      <button type="button" class="btn btn-outline-primary me-2" routerLink="/pricing">
+                        <i class="fas fa-arrow-up me-2"></i>
+                        Cambiar Plan
+                      </button>
+                      <button type="button" class="btn btn-outline-secondary" (click)="loadCurrentSubscription()">
+                        <i class="fas fa-sync-alt me-2"></i>
+                        Actualizar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card border-info">
+                  <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                      <i class="fas fa-chart-bar me-2"></i>
+                      Uso de Recursos
+                    </h5>
+                  </div>
+                  <div class="card-body">
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">VMs Activas:</label>
+                      <span class="ms-2">{{ currentSubscription.currentVMs }} / {{ currentSubscription.plan.maxVMs }}</span>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">CPU:</label>
+                      <span class="ms-2">{{ currentSubscription.usedCpu }} / {{ currentSubscription.plan.totalCpu }} cores</span>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Memoria:</label>
+                      <span class="ms-2">{{ (currentSubscription.usedMemory / 1024) | number:'1.1-1' }} / {{ (currentSubscription.plan.totalMemory / 1024) | number:'1.1-1' }} GB</span>
+                    </div>
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Almacenamiento:</label>
+                      <span class="ms-2">{{ currentSubscription.usedDisk }} / {{ currentSubscription.plan.totalDisk }} GB</span>
+                    </div>
+                    <div class="mt-3">
+                      <button type="button" class="btn btn-outline-info" routerLink="/dashboard">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Ver Dashboard
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sin suscripción -->
+            <div *ngIf="!isLoadingSubscription && !currentSubscription" class="text-center">
+              <i class="fas fa-exclamation-triangle text-warning mb-3" style="font-size: 3rem;"></i>
+              <h4>No tienes una suscripción activa</h4>
+              <p class="text-muted mb-4">
+                Para acceder a nuestros servicios necesitas activar un plan.
+              </p>
+              <button type="button" class="btn btn-warning btn-lg" routerLink="/pricing">
+                <i class="fas fa-star me-2"></i>
+                Ver Planes Disponibles
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -58,20 +183,29 @@
             <h4><i class="fas fa-lock me-2"></i> Cambiar Contraseña</h4>
           </div>
           <div class="card-body">
-            <form>
+            <form #passwordFormRef="ngForm" (ngSubmit)="changePassword()">
               <div class="mb-3">
                 <label for="current-password" class="form-label">Contraseña Actual</label>
-                <input type="password" id="current-password" class="form-control">
+                <input type="password" id="current-password" name="currentPassword" class="form-control"
+                       [(ngModel)]="passwordForm.currentPassword" required>
               </div>
               <div class="mb-3">
                 <label for="new-password" class="form-label">Nueva Contraseña</label>
-                <input type="password" id="new-password" class="form-control">
+                <input type="password" id="new-password" name="newPassword" class="form-control"
+                       [(ngModel)]="passwordForm.newPassword" required minlength="8">
+                <small class="form-text text-muted">La contraseña debe tener al menos 8 caracteres</small>
               </div>
               <div class="mb-3">
                 <label for="confirm-password" class="form-label">Confirmar Nueva Contraseña</label>
-                <input type="password" id="confirm-password" class="form-control">
+                <input type="password" id="confirm-password" name="confirmPassword" class="form-control"
+                       [(ngModel)]="passwordForm.confirmPassword" required>
               </div>
-              <button type="submit" class="btn btn-success">Actualizar Contraseña</button>
+              <button type="submit" class="btn btn-success" 
+                      [disabled]="!passwordFormRef.valid || isUpdatingPassword">
+                <span *ngIf="isUpdatingPassword" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <i *ngIf="!isUpdatingPassword" class="fas fa-key me-2"></i>
+                {{ isUpdatingPassword ? 'Actualizando...' : 'Actualizar Contraseña' }}
+              </button>
             </form>
           </div>
         </div>
@@ -84,11 +218,39 @@
             <h4><i class="fas fa-trash-alt me-2"></i> Eliminar Cuenta</h4>
           </div>
           <div class="card-body">
-            <p>
-              Esta acción es irreversible. Se eliminarán todos tus datos, máquinas virtuales y suscripciones.
-              Por favor, asegúrate de que realmente deseas continuar.
-            </p>
-            <button type="button" class="btn btn-danger">Eliminar mi cuenta permanentemente</button>
+            <div class="alert alert-danger">
+              <h5><i class="fas fa-exclamation-triangle me-2"></i> ¡Advertencia!</h5>
+              <p class="mb-0">
+                Esta acción es <strong>IRREVERSIBLE</strong>. Se eliminarán:
+              </p>
+              <ul class="mt-2 mb-0">
+                <li>Toda tu información personal</li>
+                <li>Todas tus máquinas virtuales</li>
+                <li>Tu suscripción activa</li>
+                <li>Todo el historial de pagos</li>
+              </ul>
+            </div>
+            
+            <div *ngIf="currentSubscription" class="alert alert-warning">
+              <h6><i class="fas fa-info-circle me-2"></i> Suscripción Activa</h6>
+              <p class="mb-0">
+                Tienes el plan <strong>{{ currentSubscription.plan.name }}</strong> activo. 
+                Eliminar tu cuenta también cancelará tu suscripción inmediatamente.
+              </p>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="button" class="btn btn-danger btn-lg" 
+                      (click)="deleteAccount()" 
+                      [disabled]="isDeletingAccount">
+                <span *ngIf="isDeletingAccount" class="spinner-border spinner-border-sm me-2" role="status"></span>
+                <i *ngIf="!isDeletingAccount" class="fas fa-trash-alt me-2"></i>
+                {{ isDeletingAccount ? 'Eliminando cuenta...' : 'Eliminar mi cuenta permanentemente' }}
+              </button>
+              <small class="text-muted text-center">
+                Se te pedirá escribir "ELIMINAR" para confirmar
+              </small>
+            </div>
           </div>
         </div>
       </div>

@@ -1,56 +1,44 @@
-.card {
-  border: 1px solid rgba(0, 255, 255, 0.1);
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  transition: box-shadow 0.15s ease-in-out;
-  background-color: #1a222c;
-  color: #e5e7eb;
-}
-
-.card .text-muted {
-  color: #9ca3af !important;
-}
-
-.card-header {
-  background-color: #111827;
-  border-bottom: 1px solid rgba(0, 255, 255, 0.1);
-}
+/* Estilos para Dashboard - Tema Oscuro */
 
 .card:hover {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   border-color: rgba(0, 255, 255, 0.2);
 }
-.bg-primary, .bg-success, .bg-info, .bg-warning, .bg-danger {
-  color: #fff !important;
-}
-.bg-primary, .bg-success, .bg-info, .bg-warning {
-  background: linear-gradient(45deg, var(--bs-primary), var(--bs-info)) !important;
+
+/* Corregir gradientes sin variables no definidas */
+.bg-primary {
+  background: linear-gradient(45deg, #00ffff, #17a2b8) !important;
 }
 .bg-success {
-  background: linear-gradient(45deg, var(--bs-success), var(--bs-info)) !important;
+  background: linear-gradient(45deg, #00ff88, #28a745) !important;
 }
 .bg-info {
-  background: linear-gradient(45deg, var(--bs-info), var(--bs-dark)) !important;
+  background: linear-gradient(45deg, #00ffff, #2c3a4b) !important;
 }
 .bg-warning {
-  background: linear-gradient(45deg, var(--bs-warning), var(--bs-danger)) !important;
+  background: linear-gradient(45deg, #ffff00, #ffc107) !important;
 }
 
 .list-group-item-action {
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+  background-color: rgba(27, 39, 53, 0.4);
+  border: 1px solid rgba(0, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .list-group-item-action:hover {
-  background-color: #f8f9fa;
-  color: #000;
+  background-color: rgba(0, 255, 255, 0.1);
+  color: #00ffff;
 }
 
 .console-output {
   height: 400px;
-  background-color: #212529;
+  background-color: #090a0f;
   color: #f8f9fa;
   font-family: 'Courier New', Courier, monospace;
   padding: 1rem;
   border-radius: 0.25rem;
+  border: 1px solid rgba(0, 255, 255, 0.2);
   overflow-y: auto;
 }
 
@@ -64,4 +52,66 @@
 @keyframes blink {
   from, to { background-color: transparent; }
   50% { background-color: #f8f9fa; }
-} 
+}
+
+/* Mejoras de contraste para recursos y cuenta */
+.card-body .text-muted {
+  color: #9ca3af !important; /* Color más claro para mejor contraste */
+}
+
+.card-body small.text-muted {
+  color: #d1d5db !important; /* Aún más claro para textos pequeños */
+  font-weight: 500; /* Un poco más de peso para mayor legibilidad */
+}
+
+/* Mejorar contraste en barras de progreso */
+.progress-bar {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Mejorar contraste en badges */
+.badge {
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+
+/* Sección de recursos específicamente */
+.resource-usage-section .text-muted {
+  color: #374151 !important; /* Color más oscuro para sección de recursos con fondo claro */
+}
+
+.resource-usage-section small.text-muted {
+  color: #6b7280 !important;
+  font-weight: 600;
+}
+
+/* Mejorar contraste en cards de información */
+.card-header h5, .card-header h6 {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+}
+
+/* Mejorar legibilidad de texto en cards de estadísticas */
+.card.bg-primary p, .card.bg-success p, .card.bg-info p, .card.bg-warning p {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  font-weight: 500;
+}
+
+.card.bg-primary h4, .card.bg-success h4, .card.bg-info h4, .card.bg-warning h4 {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  font-weight: 700;
+}
+
+/* Mejorar contraste en elementos específicos de recursos */
+.resource-label {
+  color: #1f2937 !important;
+  font-weight: 600;
+}
+
+.resource-value {
+  color: #374151 !important;
+  font-weight: 600;
+}

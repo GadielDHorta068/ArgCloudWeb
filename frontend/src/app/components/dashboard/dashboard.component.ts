@@ -241,11 +241,9 @@ export class DashboardComponent implements OnInit {
   }
 
   /**
-   * Redirige a la página de gestión de suscripción.
-   * NOTA: La página de destino aún debe ser creada.
+   * Redirige a la página de gestión de cuenta.
    */
   manageSubscription(): void {
-    this.toastr.info('La gestión de suscripciones estará disponible próximamente.', 'En desarrollo');
-    // this.router.navigate(['/account/subscription']);
+    this.router.navigate(['/account']);
   }
 } 

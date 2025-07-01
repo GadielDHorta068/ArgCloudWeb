@@ -203,17 +203,19 @@
 /* Botones específicos */
 .btn-primary {
   background-color: #00ffff;
-  border-color: #00ffff;
+  border: 1px solid #00ffff;
   color: #111827;
 }
 .btn-primary:hover {
   background-color: #ffffff;
   border-color: #ffffff;
+  color: #111827;
 }
 
 .btn-outline-primary {
+  background-color: transparent;
   color: #00ffff;
-  border-color: #00ffff;
+  border: 1px solid #00ffff;
 }
 .btn-outline-primary:hover {
   background-color: #00ffff;

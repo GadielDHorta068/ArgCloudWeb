@@ -4,26 +4,36 @@ import com.argcloud.vm.dto.AuthResponse;
 import com.argcloud.vm.dto.LoginRequest;
 import com.argcloud.vm.dto.RegisterRequest;
 import com.argcloud.vm.dto.ResetPasswordRequest;
+import com.argcloud.vm.dto.UpdateProfileRequest;
+import com.argcloud.vm.dto.ChangePasswordRequest;
+import com.argcloud.vm.dto.UserProfileResponse;
 import com.argcloud.vm.entity.User;
+import com.argcloud.vm.entity.UserSubscription;
 import com.argcloud.vm.repository.UserRepository;
+import com.argcloud.vm.repository.UserSubscriptionRepository;
 import com.argcloud.vm.util.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 /**
  * Servicio para la lógica de negocio relacionada con los usuarios.
- * Incluye registro, autenticación y verificación de email.
+ * Incluye registro, autenticación, verificación de email, gestión de perfil y eliminación de cuenta.
  */
 @Service  
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserSubscriptionRepository userSubscriptionRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -195,5 +205,78 @@ public class UserService {
      */
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    /**
+     * Actualiza el perfil de un usuario.
+     *
+     * @param user el usuario a actualizar.
+     * @param updateRequest los nuevos datos del perfil.
+     * @return el perfil actualizado.
+     */
+    @Transactional
+    public UserProfileResponse updateProfile(User user, UpdateProfileRequest updateRequest) {
+        user.setFirstName(updateRequest.getFirstName().trim());
+        user.setLastName(updateRequest.getLastName().trim());
+        
+        User updatedUser = userRepository.save(user);
+        return new UserProfileResponse(updatedUser);
+    }
+
+    /**
+     * Cambia la contraseña de un usuario verificando la contraseña actual.
+     *
+     * @param user el usuario que quiere cambiar su contraseña.
+     * @param changePasswordRequest la solicitud con las contraseñas.
+     * @return mensaje de éxito.
+     * @throws RuntimeException si la contraseña actual es incorrecta o las nuevas no coinciden.
+     */
+    @Transactional
+    public String changePassword(User user, ChangePasswordRequest changePasswordRequest) {
+        // Verificar que la contraseña actual sea correcta
+        if (!passwordEncoder.matches(changePasswordRequest.getCurrentPassword(), user.getPassword())) {
+            throw new RuntimeException("La contraseña actual es incorrecta");
+        }
+
+        // Verificar que las nuevas contraseñas coincidan
+        if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmPassword())) {
+            throw new RuntimeException("Las nuevas contraseñas no coinciden");
+        }
+
+        // Verificar que la nueva contraseña sea diferente a la actual
+        if (passwordEncoder.matches(changePasswordRequest.getNewPassword(), user.getPassword())) {
+            throw new RuntimeException("La nueva contraseña debe ser diferente a la actual");
+        }
+
+        // Actualizar la contraseña
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        userRepository.save(user);
+
+        return "Contraseña actualizada exitosamente";
+    }
+
+    /**
+     * Elimina permanentemente la cuenta de un usuario y todos sus datos relacionados.
+     * Esta operación es irreversible.
+     *
+     * @param user el usuario a eliminar.
+     * @return mensaje de confirmación.
+     */
+    @Transactional
+    public String deleteAccount(User user) {
+        try {
+            // 1. Eliminar todas las suscripciones del usuario
+            List<UserSubscription> subscriptions = userSubscriptionRepository.findByUserOrderByCreatedAtDesc(user);
+            if (!subscriptions.isEmpty()) {
+                userSubscriptionRepository.deleteAll(subscriptions);
+            }
+
+            // 2. Eliminar el usuario
+            userRepository.delete(user);
+
+            return "Cuenta eliminada exitosamente";
+        } catch (Exception e) {
+            throw new RuntimeException("Error al eliminar la cuenta: " + e.getMessage());
+        }
     }
 } 

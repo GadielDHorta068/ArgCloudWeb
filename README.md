@@ -10,11 +10,13 @@ ArgCloud es una plataforma completa para la gestión de máquinas virtuales en l
 - **Autenticación JWT**: Sistema de autenticación seguro
 - **Verificación por email**: Registro seguro con confirmación
 - **Recuperación de contraseña**: Flujo seguro para restablecer la contraseña por email
+- **Gestión completa de cuentas**: Actualización de perfil, cambio de contraseña y eliminación de cuenta
 - **Gestión completa de VMs**: Crear, administrar y monitorear máquinas virtuales
 - **Sistema de Planes de Hardware**: Planes parametrizables con recursos específicos
 - **Pagos con Mercado Pago**: Integración completa con CardForm y webhooks
 - **Gestión de Suscripciones**: Control de recursos y facturación
 - **Dashboard de Recursos**: Monitoreo en tiempo real del uso de recursos
+- **Panel de Cuenta Avanzado**: Vista completa de suscripción, uso de recursos y configuración
 - **Integración con Proxmox**: Conectividad directa con servidores Proxmox VE
 - **Docker**: Despliegue con contenedores
 - **Arquitectura Business-Repository-Presenter**: Código limpio y mantenible
@@ -232,6 +234,66 @@ interface VirtualMachine {
 }
 ```
 
+## 👤 Gestión de Cuentas de Usuario
+
+### Características del Sistema de Cuentas
+
+ArgCloud incluye un sistema completo de gestión de cuentas de usuario:
+
+#### 🔧 **Panel de Cuenta**
+- **Información personal**: Actualización de nombre y apellido
+- **Gestión de contraseña**: Cambio seguro con verificación de contraseña actual
+- **Vista de suscripción**: Información detallada del plan activo y uso de recursos
+- **Eliminación de cuenta**: Proceso seguro con confirmación y limpieza completa de datos
+
+#### 📊 **Información de Suscripción**
+- **Estado en tiempo real**: Visualización del estado actual de la suscripción
+- **Uso de recursos**: Monitoreo detallado de CPU, RAM, disco y VMs activas
+- **Fechas importantes**: Inicio de suscripción y próxima renovación
+- **Gestión de plan**: Acceso directo para cambiar o actualizar el plan
+
+#### 🔐 **Seguridad y Privacidad**
+- **Validación de contraseña**: Verificación de contraseña actual antes de cambios
+- **Eliminación segura**: Proceso de eliminación que incluye todas las dependencias
+- **Transacciones atómicas**: Operaciones de base de datos seguras y consistentes
+- **Auditoría de cambios**: Registro de modificaciones importantes
+
+### Acceso al Panel de Cuenta
+
+#### 🔗 **Puntos de entrada:**
+1. **Header**: Menú de usuario → "Mi Cuenta"
+2. **Dashboard**: Sección de información personal
+3. **URL directa**: `/account`
+
+#### 📱 **Secciones del Panel:**
+1. **Mis Datos** → Actualización de información personal
+2. **Mi Suscripción** → Vista completa del plan y recursos
+3. **Cambiar Contraseña** → Gestión segura de credenciales
+4. **Eliminar Cuenta** → Proceso de eliminación con advertencias
+
+### Modelo de Datos - DTOs de Usuario
+
+```typescript
+interface UpdateProfileRequest {
+  firstName: string;    // Nombre (2-50 caracteres)
+  lastName: string;     // Apellido (2-50 caracteres)
+}
+
+interface ChangePasswordRequest {
+  currentPassword: string;    // Contraseña actual (requerida)
+  newPassword: string;        // Nueva contraseña (mínimo 8 caracteres)
+  confirmPassword: string;    // Confirmación de nueva contraseña
+}
+
+interface UserProfileResponse {
+  id: number;
+  email: string;
+  firstName: string;
+  lastName: string;
+  emailVerified: boolean;
+}
+```
+
 ## 📁 Estructura del Proyecto
 
 ```
@@ -244,11 +306,12 @@ LandingPage/
 │   │   │   ├── HardwarePlanController.java
 │   │   │   ├── PaymentController.java
 │   │   │   ├── SubscriptionController.java
+│   │   │   ├── UserController.java          # NUEVO - Gestión de usuarios
 │   │   │   └── VirtualMachineController.java
 │   │   ├── service/          # Lógica de negocio
 │   │   │   ├── EmailService.java
 │   │   │   ├── MercadoPagoService.java
-│   │   │   ├── UserService.java
+│   │   │   ├── UserService.java             # ACTUALIZADO - Nuevos métodos
 │   │   │   └── VirtualMachineService.java
 │   │   ├── repository/       # Acceso a datos
 │   │   │   ├── HardwarePlanRepository.java
@@ -263,9 +326,12 @@ LandingPage/
 │   │   │   ├── UserSubscription.java
 │   │   │   └── VirtualMachine.java
 │   │   ├── dto/              # Data Transfer Objects
+│   │   │   ├── ChangePasswordRequest.java   # NUEVO - Cambio de contraseña
 │   │   │   ├── HardwarePlanResponse.java
 │   │   │   ├── PaymentRequest.java
 │   │   │   ├── PaymentResponse.java
+│   │   │   ├── UpdateProfileRequest.java    # NUEVO - Actualización de perfil
+│   │   │   ├── UserProfileResponse.java     # NUEVO - Respuesta de perfil
 │   │   │   ├── UserSubscriptionResponse.java
 │   │   │   └── ...
 │   │   ├── config/           # Configuraciones
@@ -277,6 +343,7 @@ LandingPage/
 ├── frontend/                   # Aplicación Angular
 │   ├── src/app/
 │   │   ├── components/       # Componentes Angular
+│   │   │   ├── account/             # NUEVO - Panel de gestión de cuenta
 │   │   │   ├── checkout/            # Checkout con Mercado Pago
 │   │   │   ├── dashboard/           # Dashboard principal
 │   │   │   ├── pricing/             # Página de planes
@@ -285,10 +352,12 @@ LandingPage/
 │   │   │   └── ...
 │   │   ├── services/         # Servicios
 │   │   │   ├── hardware-plan.service.ts # Servicio de planes
+│   │   │   ├── user.service.ts          # NUEVO - Servicio de usuarios
 │   │   │   ├── virtual-machine.service.ts
 │   │   │   └── ...
 │   │   ├── models/           # Modelos TypeScript
 │   │   │   ├── hardware-plan.model.ts   # Modelos de planes
+│   │   │   ├── user.model.ts            # NUEVO - Modelos de usuario
 │   │   │   ├── virtual-machine.model.ts
 │   │   │   └── ...
 │   │   ├── guards/           # Guards de rutas
@@ -330,6 +399,12 @@ LandingPage/
 - `GET /verify-email?token=...` - Verificar email
 - `POST /forgot-password` - Solicitar token para restablecer contraseña
 - `POST /reset-password` - Restablecer contraseña con token
+
+### Gestión de Usuarios (`/api/users`) - **NUEVO** - Requiere autenticación
+- `GET /profile` - Obtener perfil del usuario actual
+- `PUT /profile` - Actualizar información del perfil
+- `PUT /change-password` - Cambiar contraseña del usuario
+- `DELETE /account` - Eliminar cuenta permanentemente
 
 ### Dashboard (`/api/dashboard`) - Requiere autenticación
 - `GET /welcome` - Mensaje de bienvenida
@@ -434,6 +509,39 @@ POST /api/vms
 }
 ```
 
+### Ejemplo de Request - Actualizar Perfil
+
+```json
+PUT /api/users/profile
+{
+  "firstName": "Juan Carlos",
+  "lastName": "Pérez"
+}
+```
+
+### Ejemplo de Response - Perfil Actualizado
+
+```json
+{
+  "id": 1,
+  "email": "juan@example.com",
+  "firstName": "Juan Carlos",
+  "lastName": "Pérez",
+  "emailVerified": true
+}
+```
+
+### Ejemplo de Request - Cambiar Contraseña
+
+```json
+PUT /api/users/change-password
+{
+  "currentPassword": "contraseña_actual",
+  "newPassword": "nueva_contraseña_segura",
+  "confirmPassword": "nueva_contraseña_segura"
+}
+```
+
 ## 🎨 Funcionalidades del Frontend
 
 ### Páginas
@@ -444,6 +552,7 @@ POST /api/vms
 - **Virtual Machines**: Gestión completa de máquinas virtuales
 - **Pricing**: Página de planes de hardware con comparación y selección
 - **Checkout**: Formulario de pago integrado con Mercado Pago CardForm
+- **Account**: **NUEVO** - Panel completo de gestión de cuenta de usuario
 
 ### Características
 - Diseño responsivo con Bootstrap
@@ -456,6 +565,9 @@ POST /api/vms
 - Animaciones y transiciones suaves
 - Integración completa con Mercado Pago
 - Dashboard de recursos en tiempo real
+- **Panel de gestión de cuenta avanzado**
+- **Vista detallada de suscripción y recursos**
+- **Gestión segura de credenciales**
 
 ## ⚙️ Configuración de Desarrollo
 
@@ -524,6 +636,12 @@ El sistema maneja automáticamente las notificaciones de Mercado Pago:
 - [x] **Webhooks para sincronización de pagos**
 - [x] **Sistema de distribución inteligente de recursos**
 - [x] **Verificación de recursos antes de crear VMs**
+- [x] **Panel completo de gestión de cuenta de usuario** - **NUEVO**
+- [x] **Actualización de perfil de usuario** - **NUEVO**
+- [x] **Cambio seguro de contraseña** - **NUEVO**
+- [x] **Eliminación segura de cuenta** - **NUEVO**
+- [x] **Vista detallada de suscripción en tiempo real** - **NUEVO**
+- [x] **Monitoreo de uso de recursos por usuario** - **NUEVO**
 
 ## 🔮 Próximas Funcionalidades
 
@@ -539,6 +657,10 @@ El sistema maneja automáticamente las notificaciones de Mercado Pago:
 - [ ] Alertas automáticas por email/WhatsApp
 - [ ] Sistema de tickets de soporte
 - [ ] Métricas de performance en tiempo real
+- [ ] Historial de cambios en la cuenta
+- [ ] Autenticación de dos factores (2FA)
+- [ ] Exportación de datos personales
+- [ ] Notificaciones push para cambios de cuenta
 
 ## 📝 Licencia
 
