@@ -1,6 +1,123 @@
+/* Estilos para la página de cuenta - Tema Oscuro */
+
 .list-group-item.active {
     z-index: 2;
     color: #00ffff;
     background-color: rgba(0, 255, 255, 0.1);
     border-color: rgba(0, 255, 255, 0.3);
+}
+
+/* Mejorar legibilidad del texto general en las tarjetas */
+.card-body {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Aumentar contraste para texto 'muted' */
+.text-muted {
+    color: #9ca3af !important;
+}
+
+/* Asegurar que las etiquetas de formulario sean legibles */
+.form-label {
+    color: rgba(255, 255, 255, 0.95);
+}
+
+/* Estilos para las tarjetas de suscripción */
+.card.border-success {
+    border-color: #00ff88 !important;
+    background-color: rgba(0, 255, 136, 0.05);
+}
+
+.card-header.bg-success {
+    background-color: rgba(0, 255, 136, 0.1) !important;
+    color: #00ff88 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.card.border-info {
+    border-color: #00ffff !important;
+    background-color: rgba(0, 255, 255, 0.05);
+}
+
+.card-header.bg-info {
+    background-color: rgba(0, 255, 255, 0.1) !important;
+    color: #00ffff !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Clases de estado de la suscripción */
+.status-active {
+    color: #00ff88;
+    font-weight: bold;
+}
+
+.status-cancelled {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.status-pending {
+    color: #ffff00;
+    font-weight: bold;
+}
+
+/* Botones en la sección de suscripción */
+.btn-outline-primary {
+    color: #00ffff;
+    border-color: #00ffff;
+}
+
+.btn-outline-primary:hover {
+    background-color: #00ffff;
+    color: #090a0f;
+}
+
+.btn-outline-info {
+    color: #00ffff;
+    border-color: #00ffff;
+}
+
+.btn-outline-info:hover {
+    background-color: #00ffff;
+    color: #090a0f;
+}
+
+/* Botón de Actualizar Contraseña */
+.btn-success {
+    background-color: #00ff88;
+    border-color: #00ff88;
+    color: #090a0f;
+}
+
+.btn-success:hover {
+    background-color: white;
+    border-color: white;
+}
+
+/* Zona de Peligro */
+.card.border-danger {
+    border-color: #ff6b6b !important;
+}
+
+.card-header.bg-danger {
+    background-color: rgba(255, 107, 107, 0.2) !important;
+    color: #ff6b6b !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.alert-danger {
+    background-color: rgba(255, 107, 107, 0.1);
+    border-color: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+}
+
+.btn-danger {
+    background-color: #ff6b6b;
+    border-color: #ff6b6b;
+    color: #090a0f;
+}
+
+.btn-danger:hover {
+    background-color: white;
+    border-color: white;
 }

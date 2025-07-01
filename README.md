@@ -153,29 +153,6 @@ ArgCloud incluye un sistema completo de planes de hardware parametrizables:
 - **Facturación automática**: Renovación mensual/anual
 - **Estados de suscripción**: Activa, Pendiente, Cancelada, Expirada
 
-### Modelo de Datos - Planes
-
-```typescript
-interface HardwarePlan {
-  id: number;
-  name: string;
-  description: string;
-  monthlyPrice: number;      // Precio mensual en pesos
-  yearlyPrice: number;       // Precio anual con descuento
-  totalCpu: number;          // CPU cores disponibles
-  totalMemory: number;       // RAM en MB
-  totalDisk: number;         // Almacenamiento en GB
-  maxVMs: number;            // Máximo de VMs
-  monthlyBandwidth: number;  // Ancho de banda en GB
-  supportLevel: 'basic' | 'standard' | 'premium';
-  features: string[];        // Características incluidas
-  color: string;             // Color del tema
-  icon: string;              // Icono FontAwesome
-  isActive: boolean;
-  isPopular: boolean;
-}
-```
-
 ### Acceso a Planes y Pagos
 
 #### 🔗 **Puntos de entrada:**
@@ -214,26 +191,6 @@ ArgCloud ofrece una gestión completa de máquinas virtuales con las siguientes 
 - **Tarjetas informativas**: Cada VM se muestra con información completa
 - **Responsive**: Funciona perfectamente en desktop y móvil
 
-### Modelo de Datos - VMs
-
-```typescript
-interface VirtualMachine {
-  id: number;
-  name: string;
-  status: 'running' | 'stopped' | 'restarting' | 'creating' | 'deleting' | 'error';
-  os: string;
-  cpu: number;           // Número de cores
-  memory: number;        // RAM en MB
-  disk: number;          // Almacenamiento en GB
-  ipAddress?: string;    // Dirección IP asignada
-  macAddress?: string;   // Dirección MAC
-  nodeName?: string;     // Nodo Proxmox donde se ejecuta
-  createdAt: string;     // Fecha de creación
-  updatedAt?: string;    // Última actualización
-  userName?: string;     // Usuario propietario
-}
-```
-
 ## 👤 Gestión de Cuentas de Usuario
 
 ### Características del Sistema de Cuentas
@@ -271,27 +228,9 @@ ArgCloud incluye un sistema completo de gestión de cuentas de usuario:
 3. **Cambiar Contraseña** → Gestión segura de credenciales
 4. **Eliminar Cuenta** → Proceso de eliminación con advertencias
 
-### Modelo de Datos - DTOs de Usuario
+## �� Estructura del Proyecto
 
-```typescript
-interface UpdateProfileRequest {
-  firstName: string;    // Nombre (2-50 caracteres)
-  lastName: string;     // Apellido (2-50 caracteres)
-}
 
-interface ChangePasswordRequest {
-  currentPassword: string;    // Contraseña actual (requerida)
-  newPassword: string;        // Nueva contraseña (mínimo 8 caracteres)
-  confirmPassword: string;    // Confirmación de nueva contraseña
-}
-
-interface UserProfileResponse {
-  id: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  emailVerified: boolean;
-}
 ```
 
 ## 📁 Estructura del Proyecto
@@ -366,7 +305,9 @@ LandingPage/
 │   ├── angular.json
 │   ├── Dockerfile
 │   └── nginx.conf
-└── docker-compose.yml
+├── .env                       # Variables de entorno
+├── docker-compose.yml         # Configuración Docker
+└── README.md                 # Documentación
 ```
 
 ## 🔐 Autenticación y Seguridad
@@ -615,10 +556,13 @@ Para habilitar el envío de emails de verificación:
 3. Cambia `MERCADOPAGO_ENVIRONMENT=production`
 4. Configura webhooks en tu dominio real
 
-### Webhooks
-El sistema maneja automáticamente las notificaciones de Mercado Pago:
-- **URL**: `https://tu-dominio.com/api/payments/webhook`
-- **Eventos**: `payment.created`, `payment.updated`
+## 🔧 Configuración de Email
+
+Para habilitar el envío de emails de verificación:
+
+1. **Gmail**: Habilita la autenticación de 2 factores y genera una "Contraseña de aplicación"
+2. **Outlook**: Configura SMTP con tu contraseña normal
+3. **Otros**: Configura según el proveedor
 
 ## 🚀 Funcionalidades Completadas
 
@@ -626,7 +570,6 @@ El sistema maneja automáticamente las notificaciones de Mercado Pago:
 - [x] **Interfaz gráfica para VMs**
 - [x] **Integración con Proxmox preparada**
 - [x] **Recuperación de contraseña por email**
-- [x] **Términos y condiciones**
 - [x] **Sistema de planes de hardware parametrizables**
 - [x] **Integración completa con Mercado Pago**
 - [x] **Gestión de suscripciones y facturación**
@@ -636,12 +579,12 @@ El sistema maneja automáticamente las notificaciones de Mercado Pago:
 - [x] **Webhooks para sincronización de pagos**
 - [x] **Sistema de distribución inteligente de recursos**
 - [x] **Verificación de recursos antes de crear VMs**
-- [x] **Panel completo de gestión de cuenta de usuario** - **NUEVO**
-- [x] **Actualización de perfil de usuario** - **NUEVO**
-- [x] **Cambio seguro de contraseña** - **NUEVO**
-- [x] **Eliminación segura de cuenta** - **NUEVO**
-- [x] **Vista detallada de suscripción en tiempo real** - **NUEVO**
-- [x] **Monitoreo de uso de recursos por usuario** - **NUEVO**
+- [x] **Panel completo de gestión de cuenta de usuario**
+- [x] **Actualización de perfil de usuario**
+- [x] **Cambio seguro de contraseña**
+- [x] **Eliminación segura de cuenta**
+- [x] **Vista detallada de suscripción en tiempo real**
+- [x] **Monitoreo de uso de recursos por usuario**
 
 ## 🔮 Próximas Funcionalidades
 
@@ -664,7 +607,7 @@ El sistema maneja automáticamente las notificaciones de Mercado Pago:
 
 ## 📝 Licencia
 
-Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
+Este proyecto está bajo la Licencia MIT.
 
 ## 📞 Soporte
 

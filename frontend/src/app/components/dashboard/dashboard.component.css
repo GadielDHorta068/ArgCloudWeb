@@ -1,11 +1,11 @@
-/* Estilos para Dashboard - Tema Oscuro */
+/* Estilos para Dashboard - Tema Oscuro Consolidado */
 
 .card:hover {
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   border-color: rgba(0, 255, 255, 0.2);
 }
 
-/* Corregir gradientes sin variables no definidas */
+/* Gradientes para tarjetas de estadísticas */
 .bg-primary {
   background: linear-gradient(45deg, #00ffff, #17a2b8) !important;
 }
@@ -13,17 +13,18 @@
   background: linear-gradient(45deg, #00ff88, #28a745) !important;
 }
 .bg-info {
-  background: linear-gradient(45deg, #00ffff, #2c3a4b) !important;
+  background: linear-gradient(45deg, #00ffff, #1d4a68) !important;
 }
 .bg-warning {
-  background: linear-gradient(45deg, #ffff00, #ffc107) !important;
+  background: linear-gradient(45deg, #ffca28, #ff8f00) !important;
 }
 
+/* Estilo para lista de acciones */
 .list-group-item-action {
   transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
   background-color: rgba(27, 39, 53, 0.4);
   border: 1px solid rgba(0, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .list-group-item-action:hover {
@@ -31,6 +32,7 @@
   color: #00ffff;
 }
 
+/* Estilo para la consola de salida */
 .console-output {
   height: 400px;
   background-color: #090a0f;
@@ -54,64 +56,32 @@
   50% { background-color: #f8f9fa; }
 }
 
-/* Mejoras de contraste para recursos y cuenta */
-.card-body .text-muted {
-  color: #9ca3af !important; /* Color más claro para mejor contraste */
+/* --- Mejoras de Contraste y Legibilidad para Tema Oscuro --- */
+
+/* Texto 'muted' más claro para que sea legible */
+.card-body .text-muted, .card-body small.text-muted {
+  color: #9ca3af !important;
 }
 
-.card-body small.text-muted {
-  color: #d1d5db !important; /* Aún más claro para textos pequeños */
-  font-weight: 500; /* Un poco más de peso para mayor legibilidad */
-}
-
-/* Mejorar contraste en barras de progreso */
-.progress-bar {
-  font-size: 0.75rem;
+/* Sombra en texto para mejorar legibilidad sobre fondos con gradientes o imágenes */
+.progress-bar,
+.badge,
+.card-header h5,
+.card-header h6 {
   font-weight: 600;
   color: #ffffff !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* Mejorar contraste en badges */
-.badge {
-  font-weight: 600;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-}
-
-/* Sección de recursos específicamente */
-.resource-usage-section .text-muted {
-  color: #374151 !important; /* Color más oscuro para sección de recursos con fondo claro */
-}
-
-.resource-usage-section small.text-muted {
-  color: #6b7280 !important;
-  font-weight: 600;
-}
-
-/* Mejorar contraste en cards de información */
-.card-header h5, .card-header h6 {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  font-weight: 600;
-}
-
-/* Mejorar legibilidad de texto en cards de estadísticas */
-.card.bg-primary p, .card.bg-success p, .card.bg-info p, .card.bg-warning p {
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  font-weight: 500;
-}
-
+.card.bg-primary p, .card.bg-success p, .card.bg-info p, .card.bg-warning p,
 .card.bg-primary h4, .card.bg-success h4, .card.bg-info h4, .card.bg-warning h4 {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-  font-weight: 700;
 }
 
-/* Mejorar contraste en elementos específicos de recursos */
-.resource-label {
-  color: #1f2937 !important;
-  font-weight: 600;
-}
-
-.resource-value {
-  color: #374151 !important;
-  font-weight: 600;
+/* Texto oscuro para tarjeta de advertencia para un contraste adecuado */
+.card.bg-warning p,
+.card.bg-warning h4,
+.card.bg-warning .text-muted {
+  color: #212529 !important;
+  text-shadow: none;
 }
